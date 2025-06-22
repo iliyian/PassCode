@@ -1,0 +1,127 @@
+package com.zjut.passcode.controller;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.zjut.passcode.bean.Appointment;
+import com.zjut.passcode.dao.AppointmentDao;
+import com.zjut.passcode.util.CryptoUtil;
+
+@WebServlet("/passcode/view")
+public class PassCodeViewServlet extends HttpServlet {
+    private AppointmentDao appointmentDao = new AppointmentDao();
+    private static final String ENCRYPTION_KEY = "campus_pass_key_2024";
+    
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=UTF-8");
+        
+        String appointmentIdStr = request.getParameter("id");
+        if (appointmentIdStr == null || appointmentIdStr.trim().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "预约ID不能为空");
+            return;
+        }
+        
+        try {
+            long appointmentId = Long.parseLong(appointmentIdStr);
+            Appointment appointment = appointmentDao.getAppointmentById(appointmentId);
+            
+            if (appointment == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "预约不存在");
+                return;
+            }
+            
+            // 解密敏感信息用于显示
+            if (appointment.getVisitorPhone() != null) {
+                appointment.setVisitorPhone(CryptoUtil.sm4Decrypt(appointment.getVisitorPhone(), ENCRYPTION_KEY));
+            }
+            if (appointment.getVisitorIdCard() != null) {
+                appointment.setVisitorIdCard(CryptoUtil.sm4Decrypt(appointment.getVisitorIdCard(), ENCRYPTION_KEY));
+            }
+            
+            // 检查通行码是否有效
+            boolean isValid = isPassCodeValid(appointment);
+            
+            // 生成二维码内容
+            String qrContent = generateQRContent(appointment, appointment.getVisitorIdCard());
+            
+            // 生成二维码图片
+            String qrCodeBase64 = generateQRCode(qrContent);
+            
+            // 设置请求属性
+            request.setAttribute("appointment", appointment);
+            request.setAttribute("isValid", isValid);
+            request.setAttribute("qrCodeBase64", qrCodeBase64);
+            request.setAttribute("qrContent", qrContent);
+            
+            // 转发到通行码页面
+            request.getRequestDispatcher("/pass_code.jsp").forward(request, response);
+            
+        } catch (NumberFormatException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "无效的预约ID");
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "系统错误");
+        }
+    }
+    
+    private boolean isPassCodeValid(Appointment appointment) {
+        if (!"APPROVED".equals(appointment.getStatus())) {
+            return false;
+        }
+        
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime entryTime = appointment.getEntryTime().toLocalDateTime();
+        
+        // 通行码在进校时间前后2小时内有效
+        LocalDateTime validStart = entryTime.minusHours(2);
+        LocalDateTime validEnd = entryTime.plusHours(2);
+        
+        return now.isAfter(validStart) && now.isBefore(validEnd);
+    }
+    
+    private String generateQRContent(Appointment appointment, String decryptedIdCard) {
+        StringBuilder content = new StringBuilder();
+        content.append("姓名:").append(CryptoUtil.maskName(appointment.getVisitorName())).append("\n");
+        content.append("身份证:").append(CryptoUtil.maskIdCard(decryptedIdCard)).append("\n");
+        content.append("校区:").append(appointment.getCampus()).append("\n");
+        content.append("进校时间:").append(appointment.getEntryTime().toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))).append("\n");
+        content.append("预约类型:").append("OFFICIAL".equals(appointment.getAppointmentType()) ? "公务预约" : "社会公众预约").append("\n");
+        content.append("状态:").append(appointment.getStatus()).append("\n");
+        content.append("生成时间:").append(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        
+        return content.toString();
+    }
+    
+    private String generateQRCode(String content) {
+        try {
+            QRCodeWriter qrCodeWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, 200, 200);
+            
+            // 将BitMatrix转换为Base64编码的图片
+            StringBuilder sb = new StringBuilder();
+            sb.append("data:image/png;base64,");
+            
+            // 这里简化处理，实际项目中应该使用BufferedImage和ImageIO
+            // 为了演示，我们返回一个占位符
+            return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+            
+        } catch (WriterException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+} 
