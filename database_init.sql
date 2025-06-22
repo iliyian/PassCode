@@ -116,32 +116,32 @@ INSERT INTO `appointment` (
   `visitor_name`, `visitor_id_card`, `visitor_phone`, `visitor_unit`, `campus`, `entry_time`, `transport_mode`, `license_plate`, `appointment_type`, `created_at`, `status`, `official_dept_id`, `official_dept_no`, `official_dept_name`, `official_contact_person`, `official_reason`, `audited_by`, `audited_at`
 ) VALUES
 -- 公共预约，待审核
-('张三', 'enc_id_1', 'enc_phone_1', '某公司', '主校区', '2024-07-01 09:00:00', '步行', NULL, 'PUBLIC', '2024-06-20 10:00:00', 'PENDING', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('张三', 'enc_id_1', 'enc_phone_1', '某公司', '朝晖校区', '2024-07-01 09:00:00', '步行', NULL, 'PUBLIC', '2024-06-20 10:00:00', 'PENDING', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 -- 公共预约，已通过
-('李四', 'enc_id_2', 'enc_phone_2', '某研究院', '东校区', '2024-07-02 10:00:00', '自行车', NULL, 'PUBLIC', '2024-06-21 11:00:00', 'APPROVED', NULL, NULL, NULL, NULL, NULL, 1, '2024-06-22 09:00:00'),
+('李四', 'enc_id_2', 'enc_phone_2', '某研究院', '屏峰校区', '2024-07-02 10:00:00', '自行车', NULL, 'PUBLIC', '2024-06-21 11:00:00', 'APPROVED', NULL, NULL, NULL, NULL, NULL, 1, '2024-06-22 09:00:00'),
 -- 公共预约，已拒绝
-('王五', 'enc_id_3', 'enc_phone_3', '某企业', '南校区', '2024-07-03 14:00:00', '公交', NULL, 'PUBLIC', '2024-06-22 12:00:00', 'REJECTED', NULL, NULL, NULL, NULL, NULL, 2, '2024-06-23 10:00:00'),
+('王五', 'enc_id_3', 'enc_phone_3', '某企业', '莫干山校区', '2024-07-03 14:00:00', '公交', NULL, 'PUBLIC', '2024-06-22 12:00:00', 'REJECTED', NULL, NULL, NULL, NULL, NULL, 2, '2024-06-23 10:00:00'),
 -- 公务预约，待审核
-('赵六', 'enc_id_4', 'enc_phone_4', '市政府', '主校区', '2024-07-04 09:30:00', '小汽车', '浙A12345', 'OFFICIAL', '2024-06-23 13:00:00', 'PENDING', 1, 'D001', '计算机学院', '王老师', '业务交流', NULL, NULL),
+('赵六', 'enc_id_4', 'enc_phone_4', '市政府', '朝晖校区', '2024-07-04 09:30:00', '小汽车', '浙A12345', 'OFFICIAL', '2024-06-23 13:00:00', 'PENDING', 1, 'D001', '计算机学院', '王老师', '业务交流', NULL, NULL),
 -- 公务预约，已通过
-('钱七', 'enc_id_5', 'enc_phone_5', '省教育厅', '东校区', '2024-07-05 15:00:00', '出租车', NULL, 'OFFICIAL', '2024-06-24 14:00:00', 'APPROVED', 2, 'D002', '机械工程学院', '李主任', '调研指导', 2, '2024-06-25 10:00:00'),
+('钱七', 'enc_id_5', 'enc_phone_5', '省教育厅', '屏峰校区', '2024-07-05 15:00:00', '出租车', NULL, 'OFFICIAL', '2024-06-24 14:00:00', 'APPROVED', 2, 'D002', '机械工程学院', '李主任', '调研指导', 2, '2024-06-25 10:00:00'),
 -- 公务预约，已拒绝
-('孙八', 'enc_id_6', 'enc_phone_6', '某高校', '南校区', '2024-07-06 16:00:00', '步行', NULL, 'OFFICIAL', '2024-06-25 15:00:00', 'REJECTED', 14, 'D104', '人事处', '张处长', '合作洽谈', 1, '2024-06-26 11:00:00');
+('孙八', 'enc_id_6', 'enc_phone_6', '某高校', '莫干山校区', '2024-07-06 16:00:00', '步行', NULL, 'OFFICIAL', '2024-06-25 15:00:00', 'REJECTED', 14, 'D104', '人事处', '张处长', '合作洽谈', 1, '2024-06-26 11:00:00');
 
 -- 补充：插入已过期和当前有效的预约数据
 -- 已过期预约（entry_time早于2024-06-27）
 INSERT INTO `appointment` (
   `visitor_name`, `visitor_id_card`, `visitor_phone`, `visitor_unit`, `campus`, `entry_time`, `transport_mode`, `license_plate`, `appointment_type`, `created_at`, `status`, `official_dept_id`, `official_dept_no`, `official_dept_name`, `official_contact_person`, `official_reason`, `audited_by`, `audited_at`
 ) VALUES
-('过期访客A', 'enc_id_exp1', 'enc_phone_exp1', '过期单位A', '主校区', '2024-06-20 09:00:00', '步行', NULL, 'PUBLIC', '2024-06-10 10:00:00', 'APPROVED', NULL, NULL, NULL, NULL, NULL, 1, '2024-06-11 09:00:00'),
-('过期访客B', 'enc_id_exp2', 'enc_phone_exp2', '过期单位B', '东校区', '2024-06-15 14:00:00', '公交', NULL, 'OFFICIAL', '2024-06-05 12:00:00', 'APPROVED', 2, 'D002', '机械工程学院', '李主任', '过期公务', 2, '2024-06-06 10:00:00');
+('过期访客A', 'enc_id_exp1', 'enc_phone_exp1', '过期单位A', '朝晖校区', '2024-06-20 09:00:00', '步行', NULL, 'PUBLIC', '2024-06-10 10:00:00', 'APPROVED', NULL, NULL, NULL, NULL, NULL, 1, '2024-06-11 09:00:00'),
+('过期访客B', 'enc_id_exp2', 'enc_phone_exp2', '过期单位B', '屏峰校区', '2024-06-15 14:00:00', '公交', NULL, 'OFFICIAL', '2024-06-05 12:00:00', 'APPROVED', 2, 'D002', '机械工程学院', '李主任', '过期公务', 2, '2024-06-06 10:00:00');
 
 -- 当前有效预约（entry_time为2024-06-27，状态APPROVED）
 INSERT INTO `appointment` (
   `visitor_name`, `visitor_id_card`, `visitor_phone`, `visitor_unit`, `campus`, `entry_time`, `transport_mode`, `license_plate`, `appointment_type`, `created_at`, `status`, `official_dept_id`, `official_dept_no`, `official_dept_name`, `official_contact_person`, `official_reason`, `audited_by`, `audited_at`
 ) VALUES
-('有效访客A', 'enc_id_valid1', 'enc_phone_valid1', '有效单位A', '主校区', '2024-06-27 10:00:00', '小汽车', '浙A88888', 'PUBLIC', '2024-06-26 09:00:00', 'APPROVED', NULL, NULL, NULL, NULL, NULL, 1, '2024-06-26 12:00:00'),
-('有效访客B', 'enc_id_valid2', 'enc_phone_valid2', '有效单位B', '南校区', '2024-06-27 15:00:00', '出租车', NULL, 'OFFICIAL', '2024-06-27 10:00:00', 'APPROVED', 14, 'D104', '人事处', '张处长', '有效公务', 2, '2024-06-27 13:00:00');
+('有效访客A', 'enc_id_valid1', 'enc_phone_valid1', '有效单位A', '朝晖校区', '2024-06-27 10:00:00', '小汽车', '浙A88888', 'PUBLIC', '2024-06-26 09:00:00', 'APPROVED', NULL, NULL, NULL, NULL, NULL, 1, '2024-06-26 12:00:00'),
+('有效访客B', 'enc_id_valid2', 'enc_phone_valid2', '有效单位B', '莫干山校区', '2024-06-27 15:00:00', '出租车', NULL, 'OFFICIAL', '2024-06-27 10:00:00', 'APPROVED', 14, 'D104', '人事处', '张处长', '有效公务', 2, '2024-06-27 13:00:00');
 
 -- 创建索引
 CREATE INDEX idx_appointment_visitor ON `appointment` (`visitor_name`, `visitor_id_card`, `visitor_phone`);

@@ -292,7 +292,7 @@
     private String getAppointmentTypeDisplay(String type) {
         switch (type) {
             case "PUBLIC":
-                return "个人访问";
+                return "社会公众预约";
             case "OFFICIAL":
                 return "公务访问";
             default:
