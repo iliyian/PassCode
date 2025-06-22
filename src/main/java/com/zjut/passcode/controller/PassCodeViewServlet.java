@@ -88,11 +88,11 @@ public class PassCodeViewServlet extends HttpServlet {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime entryTime = appointment.getEntryTime().toLocalDateTime();
         
-        // 通行码在进校时间前后2小时内有效
-        LocalDateTime validStart = entryTime.minusHours(2);
-        LocalDateTime validEnd = entryTime.plusHours(2);
+        // 通行码在进校当天0点到23:59:59都有效
+        LocalDateTime validStart = entryTime.toLocalDate().atStartOfDay();
+        LocalDateTime validEnd = entryTime.toLocalDate().atTime(23, 59, 59);
         
-        return now.isAfter(validStart) && now.isBefore(validEnd);
+        return !now.isBefore(validStart) && !now.isAfter(validEnd);
     }
     
     private String generateQRContent(Appointment appointment, String decryptedIdCard) {
