@@ -46,6 +46,10 @@ public class AppointmentApplyServlet extends HttpServlet {
         String licensePlate = request.getParameter("licensePlate");
         String appointmentType = request.getParameter("appointmentType");
         String ipAddress = getClientIpAddress(request);
+        // 新增公务预约相关字段
+        String officialDeptIdStr = request.getParameter("officialDeptId");
+        String officialContactPerson = request.getParameter("officialContactPerson");
+        String officialReason = request.getParameter("officialReason");
         
         // 验证必填字段
         if (visitorName == null || visitorName.trim().isEmpty() ||
@@ -105,6 +109,14 @@ public class AppointmentApplyServlet extends HttpServlet {
             appointment.setAppointmentType(appointmentType);
             appointment.setStatus("PENDING");
             appointment.setCreatedAt(Timestamp.valueOf(LocalDateTime.now()));
+            // 公务预约字段赋值
+            if ("OFFICIAL".equals(appointmentType)) {
+                if (officialDeptIdStr != null && !officialDeptIdStr.trim().isEmpty()) {
+                    appointment.setOfficialDeptId(Integer.parseInt(officialDeptIdStr));
+                }
+                appointment.setOfficialContactPerson(officialContactPerson != null ? officialContactPerson.trim() : "");
+                appointment.setOfficialReason(officialReason != null ? officialReason.trim() : "");
+            }
             
             // 保存预约
             long appointmentId = appointmentDao.addAppointment(appointment);
