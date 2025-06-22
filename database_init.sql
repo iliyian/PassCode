@@ -9,7 +9,7 @@ CREATE TABLE `department` (
   `dept_no` VARCHAR(50) NOT NULL UNIQUE COMMENT '部门编号',
   `dept_name` VARCHAR(100) NOT NULL COMMENT '部门名称',
   `dept_type` ENUM('行政部门', '直属部门', '学院') NOT NULL COMMENT '部门类型',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`, `dept_no`, `dept_name`)
 ) COMMENT='部门信息表';
 
 -- 2. 管理员表
@@ -19,13 +19,15 @@ CREATE TABLE `admin` (
   `password_hash` VARCHAR(255) NOT NULL COMMENT '密码（SM3加密）',
   `full_name` VARCHAR(50) NOT NULL COMMENT '姓名',
   `dept_id` INT COMMENT '所在部门ID',
+  `dept_no` VARCHAR(50) COMMENT '所在部门编号',
+  `dept_name` VARCHAR(100) COMMENT '所在部门名称',
   `phone` VARCHAR(255) NOT NULL COMMENT '联系电话（SM4加密）',
   `role` ENUM('SYSTEM_ADMIN', 'SCHOOL_ADMIN', 'DEPT_ADMIN', 'AUDIT_ADMIN') NOT NULL COMMENT '角色',
   `password_last_changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '密码最后修改时间',
   `failed_login_attempts` INT DEFAULT 0 COMMENT '连续登录失败次数',
   `lockout_until` TIMESTAMP NULL COMMENT '账户锁定截止时间',
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`dept_id`) REFERENCES `department`(`id`)
+  FOREIGN KEY (`dept_id`, `dept_no`, `dept_name`) REFERENCES `department`(`id`, `dept_no`, `dept_name`)
 ) COMMENT='管理员信息表';
 
 -- 3. 预约记录表
@@ -43,12 +45,14 @@ CREATE TABLE `appointment` (
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
   `status` ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL COMMENT '审核状态',
   `official_dept_id` INT NULL COMMENT '公务访问部门ID',
+  `official_dept_no` VARCHAR(50) NULL COMMENT '公务访问部门编号',
+  `official_dept_name` VARCHAR(100) NULL COMMENT '公务访问部门名称',
   `official_contact_person` VARCHAR(50) NULL COMMENT '公务访问接待人',
   `official_reason` TEXT NULL COMMENT '来访事由',
   `audited_by` INT NULL COMMENT '审核人ID',
   `audited_at` TIMESTAMP NULL COMMENT '审核时间',
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`official_dept_id`) REFERENCES `department`(`id`),
+  FOREIGN KEY (`official_dept_id`, `official_dept_no`, `official_dept_name`) REFERENCES `department`(`id`, `dept_no`, `dept_name`),
   FOREIGN KEY (`audited_by`) REFERENCES `admin`(`id`)
 ) COMMENT='访客预约记录表';
 
