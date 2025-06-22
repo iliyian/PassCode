@@ -148,8 +148,8 @@ SET GLOBAL event_scheduler = ON;
 -- 创建触发器：更新管理员密码修改时间
 DELIMITER //
 CREATE TRIGGER update_password_changed
-BEFORE UPDATE ON admin
-FOR EACH ROW
+    BEFORE UPDATE ON admin
+    FOR EACH ROW
 BEGIN
     IF NEW.password_hash != OLD.password_hash THEN
         SET NEW.password_last_changed = CURRENT_TIMESTAMP;
