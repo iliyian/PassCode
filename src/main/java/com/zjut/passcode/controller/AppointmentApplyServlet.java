@@ -13,14 +13,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.zjut.passcode.bean.Appointment;
 import com.zjut.passcode.bean.AuditLog;
+import com.zjut.passcode.bean.Department;
 import com.zjut.passcode.dao.AppointmentDao;
 import com.zjut.passcode.dao.AuditLogDao;
+import com.zjut.passcode.dao.DepartmentDao;
 import com.zjut.passcode.util.CryptoUtil;
 
 @WebServlet("/appointment/apply")
 public class AppointmentApplyServlet extends HttpServlet {
     private AppointmentDao appointmentDao = new AppointmentDao();
     private AuditLogDao auditLogDao = new AuditLogDao();
+    private DepartmentDao departmentDao = new DepartmentDao();
     private static final String ENCRYPTION_KEY = "campus_pass_key_";
     
     @Override
@@ -112,7 +115,13 @@ public class AppointmentApplyServlet extends HttpServlet {
             // 公务预约字段赋值
             if ("OFFICIAL".equals(appointmentType)) {
                 if (officialDeptIdStr != null && !officialDeptIdStr.trim().isEmpty()) {
-                    appointment.setOfficialDeptId(Integer.parseInt(officialDeptIdStr));
+                    int deptId = Integer.parseInt(officialDeptIdStr);
+                    appointment.setOfficialDeptId(deptId);
+                    Department dept = departmentDao.getDepartmentById(deptId);
+                    if (dept != null) {
+                        appointment.setOfficialDeptNo(dept.getDeptNo());
+                        appointment.setOfficialDeptName(dept.getDeptName());
+                    }
                 }
                 appointment.setOfficialContactPerson(officialContactPerson != null ? officialContactPerson.trim() : "");
                 appointment.setOfficialReason(officialReason != null ? officialReason.trim() : "");

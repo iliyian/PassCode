@@ -253,11 +253,11 @@
                 <div class="info-title">📋 预约信息</div>
                 <div class="info-item">
                     <span class="info-label">预约人：</span>
-                    <span class="info-value">${appointment.visitorName}</span>
+                    <span class="info-value">${maskedVisitorName}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">身份证：</span>
-                    <span class="info-value">${decryptedIdCard}</span>
+                    <span class="info-value">${maskedIdCard}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">手机号：</span>

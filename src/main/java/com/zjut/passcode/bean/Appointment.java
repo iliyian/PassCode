@@ -23,6 +23,7 @@ public class Appointment {
     private Timestamp auditedAt;
     private String officialDeptName; // 用于显示
     private String auditedByName; // 用于显示
+    private String officialDeptNo;
     private List<AccompanyingPerson> accompanyingPersons; // 随行人员列表
     
     public Appointment() {}
@@ -192,6 +193,14 @@ public class Appointment {
     
     public void setAuditedByName(String auditedByName) {
         this.auditedByName = auditedByName;
+    }
+    
+    public String getOfficialDeptNo() {
+        return officialDeptNo;
+    }
+    
+    public void setOfficialDeptNo(String officialDeptNo) {
+        this.officialDeptNo = officialDeptNo;
     }
     
     public List<AccompanyingPerson> getAccompanyingPersons() {

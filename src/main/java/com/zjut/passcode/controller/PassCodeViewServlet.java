@@ -68,6 +68,8 @@ public class PassCodeViewServlet extends HttpServlet {
             request.setAttribute("isValid", isValid);
             request.setAttribute("qrCodeBase64", qrCodeBase64);
             request.setAttribute("qrContent", qrContent);
+            request.setAttribute("maskedVisitorName", CryptoUtil.maskName(appointment.getVisitorName()));
+            request.setAttribute("maskedIdCard", CryptoUtil.maskIdCard(appointment.getVisitorIdCard()));
             request.setAttribute("decryptedIdCard", appointment.getVisitorIdCard());
             request.setAttribute("decryptedPhone", appointment.getVisitorPhone());
             

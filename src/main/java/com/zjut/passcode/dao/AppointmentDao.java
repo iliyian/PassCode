@@ -15,7 +15,7 @@ import com.zjut.passcode.bean.Appointment;
 
 public class AppointmentDao extends BaseDao {
     public long addAppointment(Appointment appointment) {
-        String sql = "INSERT INTO appointment (visitor_name, visitor_id_card, visitor_phone, visitor_unit, campus, entry_time, transport_mode, license_plate, appointment_type, status, official_dept_id, official_contact_person, official_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO appointment (visitor_name, visitor_id_card, visitor_phone, visitor_unit, campus, entry_time, transport_mode, license_plate, appointment_type, status, official_dept_id, official_dept_no, official_dept_name, official_contact_person, official_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -37,8 +37,10 @@ public class AppointmentDao extends BaseDao {
             } else {
                 pstmt.setNull(11, java.sql.Types.INTEGER);
             }
-            pstmt.setString(12, appointment.getOfficialContactPerson());
-            pstmt.setString(13, appointment.getOfficialReason());
+            pstmt.setString(12, appointment.getOfficialDeptNo());
+            pstmt.setString(13, appointment.getOfficialDeptName());
+            pstmt.setString(14, appointment.getOfficialContactPerson());
+            pstmt.setString(15, appointment.getOfficialReason());
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
                 rs = pstmt.getGeneratedKeys();
@@ -391,6 +393,8 @@ public class AppointmentDao extends BaseDao {
             appointment.setOfficialDeptId(officialDeptId);
         }
         
+        appointment.setOfficialDeptNo(rs.getString("official_dept_no"));
+        appointment.setOfficialDeptName(rs.getString("official_dept_name"));
         appointment.setOfficialContactPerson(rs.getString("official_contact_person"));
         appointment.setOfficialReason(rs.getString("official_reason"));
         
@@ -400,7 +404,6 @@ public class AppointmentDao extends BaseDao {
         }
         
         appointment.setAuditedAt(rs.getTimestamp("audited_at"));
-        appointment.setOfficialDeptName(rs.getString("official_dept_name"));
         appointment.setAuditedByName(rs.getString("audited_by_name"));
         
         return appointment;
