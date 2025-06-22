@@ -184,9 +184,17 @@
             color: white;
         }
         
+        .btn-edit:hover {
+            background: #138496;
+        }
+        
         .btn-delete {
             background: #dc3545;
             color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c82333;
         }
         
         .empty-state {
@@ -198,6 +206,34 @@
         .empty-state h3 {
             margin-bottom: 10px;
             color: #333;
+        }
+        
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        
+        .delete-confirm {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
         }
         
         @media (max-width: 768px) {
@@ -225,6 +261,15 @@
             }
         }
     </style>
+    <script>
+        function confirmDelete(element) {
+            var deptId = element.getAttribute('data-id');
+            var deptName = element.getAttribute('data-name');
+            if (confirm('确定要删除部门 "' + deptName + '" 吗？此操作不可撤销。')) {
+                window.location.href = '${pageContext.request.contextPath}/admin/department/delete?id=' + deptId;
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="header">
@@ -244,7 +289,19 @@
         </div>
         
         <div class="departments-content">
-            <a href="#" class="add-dept-btn">➕ 添加新部门</a>
+            <% if (request.getAttribute("success") != null) { %>
+                <div class="message success-message">
+                    ✅ <%= request.getAttribute("success") %>
+                </div>
+            <% } %>
+            
+            <% if (request.getAttribute("error") != null) { %>
+                <div class="message error-message">
+                    ❌ <%= request.getAttribute("error") %>
+                </div>
+            <% } %>
+            
+            <a href="${pageContext.request.contextPath}/admin/department/add" class="add-dept-btn">➕ 添加新部门</a>
             
             <% if (departments != null && !departments.isEmpty()) { %>
                 <table class="departments-table">
@@ -269,8 +326,13 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="#" class="action-btn btn-edit">编辑</a>
-                                    <a href="#" class="action-btn btn-delete">删除</a>
+                                    <a href="${pageContext.request.contextPath}/admin/department/edit?id=<%= dept.getId() %>" 
+                                       class="action-btn btn-edit">✏️ 编辑</a>
+                                    <a href="javascript:void(0)" 
+                                       data-id="<%= dept.getId() %>"
+                                       data-name="<%= dept.getDeptName() %>"
+                                       onclick="confirmDelete(this)" 
+                                       class="action-btn btn-delete">🗑️ 删除</a>
                                 </td>
                             </tr>
                         <% } %>
@@ -279,7 +341,7 @@
             <% } else { %>
                 <div class="empty-state">
                     <h3>暂无部门记录</h3>
-                    <p>当前系统中没有部门记录</p>
+                    <p>当前系统中没有部门记录，点击上方"添加新部门"按钮开始创建</p>
                 </div>
             <% } %>
         </div>

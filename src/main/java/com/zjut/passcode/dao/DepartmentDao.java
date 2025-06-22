@@ -41,8 +41,19 @@ public class DepartmentDao extends BaseDao {
             pstmt.setString(2, department.getDeptName());
             pstmt.setString(3, department.getDeptType());
             pstmt.setInt(4, department.getId());
-            return pstmt.executeUpdate() > 0;
+            
+            // Debug: Print update parameters
+            System.out.println("DEBUG: Updating department:");
+            System.out.println("  ID: " + department.getId());
+            System.out.println("  deptNo: " + department.getDeptNo());
+            System.out.println("  deptName: " + department.getDeptName());
+            System.out.println("  deptType: " + department.getDeptType());
+            
+            int result = pstmt.executeUpdate();
+            System.out.println("DEBUG: Update result: " + result + " rows affected");
+            return result > 0;
         } catch (SQLException e) {
+            System.out.println("ERROR: Failed to update department in database");
             e.printStackTrace();
             return false;
         } finally {

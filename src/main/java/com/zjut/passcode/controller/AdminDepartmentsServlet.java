@@ -22,6 +22,10 @@ public class AdminDepartmentsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        // Set character encoding to handle Chinese characters
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        
         // Check if admin is logged in
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("admin") == null) {
@@ -40,6 +44,18 @@ public class AdminDepartmentsServlet extends HttpServlet {
             // Set attributes for JSP
             request.setAttribute("departments", departments);
             request.setAttribute("admin", admin);
+            
+            // Check for messages from other operations
+            String successMsg = request.getParameter("success");
+            String errorMsg = request.getParameter("error");
+            
+            if (successMsg != null && !successMsg.trim().isEmpty()) {
+                request.setAttribute("success", successMsg);
+            }
+            
+            if (errorMsg != null && !errorMsg.trim().isEmpty()) {
+                request.setAttribute("error", errorMsg);
+            }
             
             // Forward to departments management page
             request.getRequestDispatcher("/admin/departments.jsp").forward(request, response);
