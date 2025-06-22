@@ -275,12 +275,6 @@
                 <div class="action-description">查看系统操作和登录日志</div>
             </a>
             
-            <a href="${pageContext.request.contextPath}/admin/settings" class="action-card">
-                <div class="action-icon">⚙️</div>
-                <div class="action-title">系统设置</div>
-                <div class="action-description">配置系统参数和安全设置</div>
-            </a>
-            
             <a href="${pageContext.request.contextPath}/admin/reports" class="action-card">
                 <div class="action-icon">📈</div>
                 <div class="action-title">统计报告</div>
