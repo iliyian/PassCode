@@ -13,10 +13,15 @@ public class CryptoUtil {
     // SM3哈希算法（使用SHA-256作为替代，实际项目中应使用真正的SM3实现）
     public static String sm3Hash(String input) {
         try {
+            System.out.println("INFO: Hashing input: " + input);
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(input.getBytes("UTF-8"));
-            return bytesToHex(hash);
+            String hashResult = bytesToHex(hash);
+            System.out.println("INFO: Hash result: " + hashResult);
+            return hashResult;
         } catch (Exception e) {
+            System.out.println("ERROR: Password hashing failed");
+            System.out.println("ERROR Details: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

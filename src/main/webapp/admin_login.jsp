@@ -216,6 +216,16 @@
         <% if (request.getAttribute("error") != null) { %>
             <div class="message message-error">
                 ❌ <%= request.getAttribute("error") %>
+                <% if (request.getAttribute("errorDetails") != null) { %>
+                    <div style="margin-top: 10px; font-size: 0.9em; font-weight: normal;">
+                        📋 <%= request.getAttribute("errorDetails") %>
+                    </div>
+                <% } %>
+                <% if (request.getAttribute("errorType") != null) { %>
+                    <div style="margin-top: 5px; font-size: 0.85em; font-weight: normal; color: #721c24;">
+                        🔍 错误类型: <%= getErrorTypeDescription((String)request.getAttribute("errorType")) %>
+                    </div>
+                <% } %>
             </div>
         <% } %>
         
@@ -223,6 +233,11 @@
         <% if (request.getAttribute("warning") != null) { %>
             <div class="message message-warning">
                 ⚠️ <%= request.getAttribute("warning") %>
+                <% if (request.getAttribute("warningDetails") != null) { %>
+                    <div style="margin-top: 10px; font-size: 0.9em; font-weight: normal;">
+                        📋 <%= request.getAttribute("warningDetails") %>
+                    </div>
+                <% } %>
             </div>
         <% } %>
         
@@ -290,5 +305,30 @@
             document.getElementById('loginName').focus();
         };
     </script>
+    
+    <%!
+    private String getErrorTypeDescription(String errorType) {
+        switch (errorType) {
+            case "INPUT_VALIDATION":
+                return "输入验证错误";
+            case "USER_NOT_FOUND":
+                return "用户不存在";
+            case "PASSWORD_MISMATCH":
+                return "密码不匹配";
+            case "ACCOUNT_LOCKED":
+                return "账户被锁定";
+            case "DATABASE_CONNECTION":
+                return "数据库连接错误";
+            case "PASSWORD_ENCRYPTION":
+                return "密码加密错误";
+            case "LOCKOUT_ERROR":
+                return "账户锁定错误";
+            case "UNKNOWN_ERROR":
+                return "未知错误";
+            default:
+                return "系统错误";
+        }
+    }
+    %>
 </body>
 </html>

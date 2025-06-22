@@ -15,7 +15,7 @@ import com.zjut.passcode.bean.AccompanyingPerson;
 public class AppointmentDao {
     private static final String DB_URL = "jdbc:mysql://localhost:3306/campus_pass?useSSL=false&serverTimezone=UTC";
     private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "password";
+    private static final String DB_PASSWORD = "351415341";
     
     static {
         try {

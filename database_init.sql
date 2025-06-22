@@ -102,10 +102,10 @@ INSERT INTO `department` (`dept_no`, `dept_name`, `dept_type`) VALUES
 
 -- 插入系统管理员（密码：Admin@123，使用SHA-256哈希）
 INSERT INTO `admin` (`login_name`, `password_hash`, `full_name`, `dept_id`, `phone`, `role`) VALUES
-('admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '系统管理员', 1, 'encrypted_phone_1', 'SYSTEM_ADMIN'),
-('school_admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '学校管理员', 1, 'encrypted_phone_2', 'SCHOOL_ADMIN'),
-('dept_admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '部门管理员', 1, 'encrypted_phone_3', 'DEPT_ADMIN'),
-('audit_admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9', '审计管理员', 1, 'encrypted_phone_4', 'AUDIT_ADMIN');
+('admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '系统管理员', 1, 'encrypted_phone_1', 'SYSTEM_ADMIN'),
+('school_admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '学校管理员', 1, 'encrypted_phone_2', 'SCHOOL_ADMIN'),
+('dept_admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '部门管理员', 1, 'encrypted_phone_3', 'DEPT_ADMIN'),
+('audit_admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '审计管理员', 1, 'encrypted_phone_4', 'AUDIT_ADMIN');
 
 -- 创建索引
 CREATE INDEX idx_appointment_visitor ON `appointment` (`visitor_name`, `visitor_id_card`, `visitor_phone`);
