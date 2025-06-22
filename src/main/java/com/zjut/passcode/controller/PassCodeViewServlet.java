@@ -68,6 +68,8 @@ public class PassCodeViewServlet extends HttpServlet {
             request.setAttribute("isValid", isValid);
             request.setAttribute("qrCodeBase64", qrCodeBase64);
             request.setAttribute("qrContent", qrContent);
+            request.setAttribute("decryptedIdCard", appointment.getVisitorIdCard());
+            request.setAttribute("decryptedPhone", appointment.getVisitorPhone());
             
             // 转发到通行码页面
             request.getRequestDispatcher("/pass_code.jsp").forward(request, response);
