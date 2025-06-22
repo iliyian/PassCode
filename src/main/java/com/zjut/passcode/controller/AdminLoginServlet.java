@@ -238,7 +238,7 @@ public class AdminLoginServlet extends HttpServlet {
             // Redirect based on role
             if ("AUDIT_ADMIN".equals(admin.getRole())) {
                 System.out.println("INFO: Redirecting to audit admin page");
-                response.sendRedirect(request.getContextPath() + "/admin/audit_log_manage.jsp");
+                response.sendRedirect(request.getContextPath() + "/admin/audit_logs");
             } else {
                 System.out.println("INFO: Redirecting to admin index page");
                 response.sendRedirect(request.getContextPath() + "/admin/index.jsp");

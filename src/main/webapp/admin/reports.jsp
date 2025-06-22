@@ -102,38 +102,6 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        
-        .stat-icon {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-        
-        .stat-number {
-            font-size: 2em;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 1em;
-            opacity: 0.9;
-        }
-        
         .report-section {
             margin-bottom: 30px;
             padding: 20px;
@@ -214,10 +182,6 @@
                 font-size: 1.5em;
             }
             
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .report-table {
                 font-size: 0.9em;
             }
@@ -247,99 +211,6 @@
         </div>
         
         <div class="reports-content">
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📋</div>
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">总预约数</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">✅</div>
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">已通过预约</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">❌</div>
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">已拒绝预约</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⏳</div>
-                    <div class="stat-number">0</div>
-                    <div class="stat-label">待审核预约</div>
-                </div>
-            </div>
-            
-            <div class="report-section">
-                <div class="section-title">预约统计</div>
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>日期</th>
-                            <th>预约总数</th>
-                            <th>通过数</th>
-                            <th>拒绝数</th>
-                            <th>通过率</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="5" style="text-align: center; color: #666;">暂无数据</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <a href="#" class="export-btn">📊 导出报告</a>
-            </div>
-            
-            <div class="report-section">
-                <div class="section-title">用户活跃度</div>
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>管理员</th>
-                            <th>登录次数</th>
-                            <th>最后登录时间</th>
-                            <th>操作次数</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="4" style="text-align: center; color: #666;">暂无数据</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="report-section">
-                <div class="section-title">系统性能</div>
-                <table class="report-table">
-                    <thead>
-                        <tr>
-                            <th>指标</th>
-                            <th>当前值</th>
-                            <th>状态</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>数据库连接</td>
-                            <td>正常</td>
-                            <td style="color: #28a745;">✅ 正常</td>
-                        </tr>
-                        <tr>
-                            <td>系统运行时间</td>
-                            <td>0 天 0 小时</td>
-                            <td style="color: #28a745;">✅ 正常</td>
-                        </tr>
-                        <tr>
-                            <td>内存使用率</td>
-                            <td>0%</td>
-                            <td style="color: #28a745;">✅ 正常</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            
             <!-- 申请月度统计 -->
             <div class="report-section">
                 <div class="section-title">按申请月度统计</div>

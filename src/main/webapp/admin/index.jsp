@@ -261,11 +261,21 @@
                     <div class="action-title">部门管理</div>
                     <div class="action-description">管理所有学校部门和机构信息</div>
                 </a>
+                <a href="${pageContext.request.contextPath}/admin/reports" class="action-card">
+                    <div class="action-icon">📈</div>
+                    <div class="action-title">统计报告</div>
+                    <div class="action-description">查看系统使用统计和报告</div>
+                </a>
             <% } else if ("DEPT_ADMIN".equals(admin.getRole())) { %>
                 <a href="${pageContext.request.contextPath}/admin/appointments" class="action-card">
                     <div class="action-icon">📋</div>
                     <div class="action-title">预约管理</div>
                     <div class="action-description">仅能管理本部门社会公众预约，管理公务预约需学校管理员授权</div>
+                </a>
+                <a href="${pageContext.request.contextPath}/admin/reports" class="action-card">
+                    <div class="action-icon">📈</div>
+                    <div class="action-title">统计报告</div>
+                    <div class="action-description">查看系统使用统计和报告</div>
                 </a>
             <% } else { %>
                 <a href="${pageContext.request.contextPath}/admin/appointments" class="action-card">
