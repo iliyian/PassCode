@@ -228,26 +228,6 @@
         </div>
         
         <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">📋</div>
-                <div class="stat-number">0</div>
-                <div class="stat-label">待审核预约</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">✅</div>
-                <div class="stat-number">0</div>
-                <div class="stat-label">已审核预约</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-number">0</div>
-                <div class="stat-label">今日访客</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">📊</div>
-                <div class="stat-number">0</div>
-                <div class="stat-label">系统日志</div>
-            </div>
         </div>
         
         <div class="actions-grid">
