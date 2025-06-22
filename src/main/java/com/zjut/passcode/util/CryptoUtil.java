@@ -13,7 +13,11 @@ import org.bouncycastle.crypto.params.KeyParameter;
 
 public class CryptoUtil {
     
-    // SM3哈希算法（真正实现）
+    /**
+     * 对输入字符串进行SM3哈希运算。
+     * @param input 输入字符串
+     * @return 哈希值的十六进制字符串
+     */
     public static String sm3Hash(String input) {
         try {
             System.out.println("INFO: Hashing input: " + input);
@@ -33,7 +37,12 @@ public class CryptoUtil {
         }
     }
     
-    // 获取并校验SM4密钥长度
+    /**
+     * 获取SM4加密算法所需的16字节密钥。
+     * @param key 密钥字符串
+     * @return 16字节密钥数组
+     * @throws Exception 如果密钥长度不为16字节则抛出异常
+     */
     private static byte[] getSm4KeyBytes(String key) throws Exception {
         byte[] keyBytes = key.getBytes("UTF-8");
         if (keyBytes.length != 16) {
@@ -42,7 +51,12 @@ public class CryptoUtil {
         return keyBytes;
     }
     
-    // SM4加密（真正实现，ECB/PKCS7Padding）
+    /**
+     * 使用SM4算法对明文进行加密（ECB/PKCS7Padding）。
+     * @param plaintext 明文
+     * @param key 16字节密钥
+     * @return 加密后的Base64字符串
+     */
     public static String sm4Encrypt(String plaintext, String key) {
         try {
             byte[] keyBytes = getSm4KeyBytes(key);
@@ -61,7 +75,12 @@ public class CryptoUtil {
         }
     }
     
-    // SM4解密（真正实现，ECB/PKCS7Padding）
+    /**
+     * 使用SM4算法对密文进行解密（ECB/PKCS7Padding）。
+     * @param encryptedText Base64编码的密文
+     * @param key 16字节密钥
+     * @return 解密后的明文字符串
+     */
     public static String sm4Decrypt(String encryptedText, String key) {
         try {
             byte[] keyBytes = getSm4KeyBytes(key);
@@ -80,7 +99,11 @@ public class CryptoUtil {
         }
     }
     
-    // 生成HMAC-SM3签名
+    /**
+     * 生成HMAC-SM3签名。
+     * @param data 待签名数据
+     * @return HMAC-SM3签名字符串
+     */
     public static String generateHmacSm3(String data) {
         try {
             String key = "campus_pass_secret_key_2024";
@@ -92,7 +115,10 @@ public class CryptoUtil {
         }
     }
     
-    // 生成随机密钥
+    /**
+     * 生成随机128位密钥（Base64编码）。
+     * @return Base64编码的密钥字符串
+     */
     public static String generateKey() {
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance("AES");
@@ -105,7 +131,11 @@ public class CryptoUtil {
         }
     }
     
-    // 数据脱敏处理
+    /**
+     * 对姓名进行脱敏处理。
+     * @param name 姓名
+     * @return 脱敏后的姓名
+     */
     public static String maskName(String name) {
         if (name == null || name.length() <= 1) {
             return name;
@@ -123,6 +153,11 @@ public class CryptoUtil {
         }
     }
     
+    /**
+     * 对身份证号进行脱敏处理。
+     * @param idCard 身份证号
+     * @return 脱敏后的身份证号
+     */
     public static String maskIdCard(String idCard) {
         if (idCard == null || idCard.length() < 8) {
             return idCard;
@@ -130,6 +165,11 @@ public class CryptoUtil {
         return idCard.substring(0, 6) + "********" + idCard.substring(idCard.length() - 4);
     }
     
+    /**
+     * 对手机号进行脱敏处理。
+     * @param phone 手机号
+     * @return 脱敏后的手机号
+     */
     public static String maskPhone(String phone) {
         if (phone == null || phone.length() < 7) {
             return phone;
@@ -137,7 +177,11 @@ public class CryptoUtil {
         return phone.substring(0, 3) + "****" + phone.substring(phone.length() - 4);
     }
     
-    // 字节数组转十六进制字符串
+    /**
+     * 字节数组转为十六进制字符串。
+     * @param bytes 字节数组
+     * @return 十六进制字符串
+     */
     private static String bytesToHex(byte[] bytes) {
         StringBuilder result = new StringBuilder();
         for (byte b : bytes) {
@@ -146,7 +190,11 @@ public class CryptoUtil {
         return result.toString();
     }
     
-    // 密码复杂度验证
+    /**
+     * 校验密码复杂度，要求包含数字、大小写字母和特殊字符，且长度不少于8位。
+     * @param password 密码
+     * @return 若符合复杂度要求返回true，否则返回false
+     */
     public static boolean validatePasswordComplexity(String password) {
         if (password == null || password.length() < 8) {
             return false;

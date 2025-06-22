@@ -3,31 +3,70 @@ package com.zjut.passcode.bean;
 import java.sql.Timestamp;
 import java.util.List;
 
+/**
+ * 预约实体类，封装预约相关信息。
+ */
 public class Appointment {
+    /** 预约ID */
     private long id;
+    /** 访客姓名 */
     private String visitorName;
+    /** 访客身份证号 */
     private String visitorIdCard;
+    /** 访客手机号 */
     private String visitorPhone;
+    /** 访客单位 */
     private String visitorUnit;
+    /** 校区 */
     private String campus;
+    /** 进校时间 */
     private Timestamp entryTime;
+    /** 交通方式 */
     private String transportMode;
+    /** 车牌号 */
     private String licensePlate;
+    /** 预约类型 */
     private String appointmentType;
+    /** 创建时间 */
     private Timestamp createdAt;
+    /** 预约状态 */
     private String status;
+    /** 公务访问部门ID */
     private Integer officialDeptId;
+    /** 公务联系人 */
     private String officialContactPerson;
+    /** 公务事由 */
     private String officialReason;
+    /** 审核人ID */
     private Integer auditedBy;
+    /** 审核时间 */
     private Timestamp auditedAt;
-    private String officialDeptName; // 用于显示
-    private String auditedByName; // 用于显示
+    /** 公务访问部门名称 */
+    private String officialDeptName;
+    /** 审核人姓名 */
+    private String auditedByName;
+    /** 公务访问部门编号 */
     private String officialDeptNo;
-    private List<AccompanyingPerson> accompanyingPersons; // 随行人员列表
+    /** 随行人员列表 */
+    private List<AccompanyingPerson> accompanyingPersons;
     
+    /**
+     * 无参构造方法。
+     */
     public Appointment() {}
     
+    /**
+     * 带参数构造方法。
+     * @param visitorName 访客姓名
+     * @param visitorIdCard 访客身份证号
+     * @param visitorPhone 访客手机号
+     * @param visitorUnit 访客单位
+     * @param campus 校区
+     * @param entryTime 进校时间
+     * @param transportMode 交通方式
+     * @param licensePlate 车牌号
+     * @param appointmentType 预约类型
+     */
     public Appointment(String visitorName, String visitorIdCard, String visitorPhone, 
                       String visitorUnit, String campus, Timestamp entryTime, 
                       String transportMode, String licensePlate, String appointmentType) {

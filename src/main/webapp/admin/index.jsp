@@ -207,6 +207,8 @@
     </style>
 </head>
 <body>
+    <%-- 管理员控制台首页，显示欢迎信息和快捷操作 --%>
+    <%-- 检查管理员是否已登录，未登录则重定向 --%>
     <div class="header">
         <div class="logo">🏫 校园通行码管理系统</div>
         <div class="user-info">
@@ -296,7 +298,7 @@
     </div>
     
     <script>
-        // Update current time
+        // 实时更新时间显示
         function updateTime() {
             const now = new Date();
             const timeString = now.toLocaleString('zh-CN');

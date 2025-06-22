@@ -13,7 +13,15 @@ import java.util.Map;
 import com.zjut.passcode.bean.AccompanyingPerson;
 import com.zjut.passcode.bean.Appointment;
 
+/**
+ * 预约相关数据库操作的DAO类。
+ */
 public class AppointmentDao extends BaseDao {
+    /**
+     * 新增预约记录。
+     * @param appointment 预约对象
+     * @return 新增预约的ID，失败返回-1
+     */
     public long addAppointment(Appointment appointment) {
         String sql = "INSERT INTO appointment (visitor_name, visitor_id_card, visitor_phone, visitor_unit, campus, entry_time, transport_mode, license_plate, appointment_type, status, official_dept_id, official_dept_no, official_dept_name, official_contact_person, official_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = null;
@@ -62,6 +70,12 @@ public class AppointmentDao extends BaseDao {
         return -1;
     }
 
+    /**
+     * 新增随行人员记录。
+     * @param appointmentId 预约ID
+     * @param person 随行人员对象
+     * @return 是否添加成功
+     */
     private boolean addAccompanyingPerson(long appointmentId, AccompanyingPerson person) {
         String sql = "INSERT INTO accompanying_person (appointment_id, full_name, id_card, phone) VALUES (?, ?, ?, ?)";
         Connection conn = null;
@@ -82,6 +96,11 @@ public class AppointmentDao extends BaseDao {
         return false;
     }
 
+    /**
+     * 更新预约信息。
+     * @param appointment 预约对象
+     * @return 是否更新成功
+     */
     public boolean updateAppointment(Appointment appointment) {
         String sql = "UPDATE appointment SET visitor_name=?, visitor_id_card=?, visitor_phone=?, visitor_unit=?, campus=?, entry_time=?, transport_mode=?, license_plate=?, appointment_type=?, status=?, official_dept_id=?, official_contact_person=?, official_reason=? WHERE id=?";
         Connection conn = null;
@@ -112,6 +131,13 @@ public class AppointmentDao extends BaseDao {
         }
     }
 
+    /**
+     * 更新预约状态。
+     * @param appointmentId 预约ID
+     * @param status 新状态
+     * @param auditedBy 审核人ID
+     * @return 是否更新成功
+     */
     public boolean updateAppointmentStatus(long appointmentId, String status, int auditedBy) {
         String sql = "UPDATE appointment SET status = ?, audited_by = ?, audited_at = CURRENT_TIMESTAMP WHERE id = ?";
         Connection conn = null;
@@ -131,6 +157,11 @@ public class AppointmentDao extends BaseDao {
         return false;
     }
 
+    /**
+     * 删除预约。
+     * @param id 预约ID
+     * @return 是否删除成功
+     */
     public boolean deleteAppointment(long id) {
         String sql = "DELETE FROM appointment WHERE id=?";
         Connection conn = null;
@@ -148,6 +179,11 @@ public class AppointmentDao extends BaseDao {
         }
     }
 
+    /**
+     * 根据ID获取预约。
+     * @param id 预约ID
+     * @return 预约对象，未找到返回null
+     */
     public Appointment getAppointmentById(long id) {
         String sql = "SELECT a.*, d.dept_name as official_dept_name, adm.full_name as audited_by_name " +
                     "FROM appointment a " +
@@ -173,6 +209,13 @@ public class AppointmentDao extends BaseDao {
         return null;
     }
 
+    /**
+     * 根据访客信息获取预约列表。
+     * @param visitorName 访客姓名
+     * @param encryptedIdCard 加密身份证号
+     * @param encryptedPhone 加密手机号
+     * @return 预约列表
+     */
     public List<Appointment> getAppointmentsByVisitor(String visitorName, String encryptedIdCard, String encryptedPhone) {
         String sql = "SELECT a.*, d.dept_name as official_dept_name, adm.full_name as audited_by_name " +
                     "FROM appointment a " +

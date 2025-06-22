@@ -18,17 +18,28 @@ import com.zjut.passcode.dao.AdminDao;
 import com.zjut.passcode.dao.AuditLogDao;
 import com.zjut.passcode.util.CryptoUtil;
 
+/**
+ * 管理员登录Servlet，处理管理员登录相关请求。
+ */
 @WebServlet("/admin/login")
 public class AdminLoginServlet extends HttpServlet {
+    /** 管理员数据访问对象 */
     private AdminDao adminDao = new AdminDao();
+    /** 审计日志数据访问对象 */
     private AuditLogDao auditLogDao = new AuditLogDao();
     
+    /**
+     * 处理GET请求，跳转到登录页面。
+     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         request.getRequestDispatcher("/admin_login.jsp").forward(request, response);
     }
     
+    /**
+     * 处理POST请求，执行登录逻辑。
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -246,6 +257,11 @@ public class AdminLoginServlet extends HttpServlet {
         }
     }
     
+    /**
+     * 获取客户端IP地址。
+     * @param request HTTP请求对象
+     * @return 客户端IP地址
+     */
     private String getClientIpAddress(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor != null && !xForwardedFor.isEmpty() && !"unknown".equalsIgnoreCase(xForwardedFor)) {
@@ -258,6 +274,12 @@ public class AdminLoginServlet extends HttpServlet {
         return request.getRemoteAddr();
     }
     
+    /**
+     * 记录登录失败日志。
+     * @param loginName 登录名
+     * @param ipAddress 客户端IP
+     * @param reason 失败原因
+     */
     private void logFailedLogin(String loginName, String ipAddress, String reason) {
         try {
             AuditLog log = new AuditLog(0, loginName, "登录失败", reason, ipAddress);
@@ -271,6 +293,13 @@ public class AdminLoginServlet extends HttpServlet {
         }
     }
     
+    /**
+     * 记录系统错误日志。
+     * @param action 操作描述
+     * @param e 异常对象
+     * @param loginName 登录名
+     * @param ipAddress 客户端IP
+     */
     private void logError(String action, Exception e, String loginName, String ipAddress) {
         try {
             String details = action + " - Exception: " + e.getClass().getSimpleName() + ": " + e.getMessage();

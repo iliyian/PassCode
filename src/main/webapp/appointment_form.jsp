@@ -229,10 +229,11 @@
     </style>
 </head>
 <body>
+    <%-- 预约申请页面，用户填写进校预约信息 --%>
     <div class="container">
         <div class="header">
             <h1>📝 进校预约申请</h1>
-            <p>请填写以下信息完成预约申请</p>
+            <p>请如实填写以下信息，带*为必填项</p>
         </div>
         
         <div class="form-container">
