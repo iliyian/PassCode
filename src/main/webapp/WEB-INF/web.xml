@@ -53,17 +53,17 @@
         <role-name>admin</role-name>
     </security-role>
     
-    <!-- 安全配置 - 只保护管理功能，不保护登录页面 -->
-    <security-constraint>
-        <web-resource-collection>
-            <web-resource-name>Admin Management Area</web-resource-name>
-            <url-pattern>/admin/manage</url-pattern>
-            <url-pattern>/admin/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>admin</role-name>
-        </auth-constraint>
-    </security-constraint>
+<!--    &lt;!&ndash; 安全配置 - 只保护管理功能，不保护登录页面 &ndash;&gt;-->
+<!--    <security-constraint>-->
+<!--        <web-resource-collection>-->
+<!--            <web-resource-name>Admin Management Area</web-resource-name>-->
+<!--            <url-pattern>/admin/manage</url-pattern>-->
+<!--            <url-pattern>/admin/*</url-pattern>-->
+<!--        </web-resource-collection>-->
+<!--        <auth-constraint>-->
+<!--            <role-name>admin</role-name>-->
+<!--        </auth-constraint>-->
+<!--    </security-constraint>-->
     
     <!-- 应用信息 -->
     <description>

@@ -226,7 +226,7 @@
             </div>
         <% } %>
         
-        <form action="${pageContext.request.contextPath}/doAdminLogin" method="post">
+                <form action="${pageContext.request.contextPath}/admin/login" method="post">
             <div class="form-group">
                 <label for="loginName">用户名</label>
                 <input type="text" id="loginName" name="loginName" required 
@@ -291,4 +291,4 @@
         };
     </script>
 </body>
-</html> 
+</html>
