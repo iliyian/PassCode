@@ -219,6 +219,7 @@ public class AdminLoginServlet extends HttpServlet {
             session.setAttribute("adminName", admin.getFullName());
             session.setAttribute("adminRole", admin.getRole());
             session.setAttribute("adminDeptId", admin.getDeptId());
+            session.setAttribute("loginTime", LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             session.setMaxInactiveInterval(30 * 60); // 30 minutes timeout
             System.out.println("INFO: Session created for user: " + loginName);
             System.out.println("INFO: Session timeout: 30 minutes");

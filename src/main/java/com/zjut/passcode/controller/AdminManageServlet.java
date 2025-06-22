@@ -154,7 +154,7 @@ public class AdminManageServlet extends HttpServlet {
         try {
             // 加密密码和手机号
             String hashedPassword = CryptoUtil.sm3Hash(password);
-            String encryptedPhone = CryptoUtil.sm4Encrypt(phone, "campus_pass_key_2024");
+            String encryptedPhone = CryptoUtil.sm4Encrypt(phone, "campus_pass_key_16");
             
             Admin admin = new Admin();
             admin.setLoginName(loginName);
@@ -216,7 +216,7 @@ public class AdminManageServlet extends HttpServlet {
             admin.setLoginName(loginName);
             admin.setFullName(fullName);
             admin.setDeptId(deptIdStr != null && !deptIdStr.trim().isEmpty() ? Integer.parseInt(deptIdStr) : 0);
-            admin.setPhone(CryptoUtil.sm4Encrypt(phone, "campus_pass_key_2024"));
+            admin.setPhone(CryptoUtil.sm4Encrypt(phone, "campus_pass_key_"));
             admin.setRole(role);
             
             if (adminDao.updateAdmin(admin)) {

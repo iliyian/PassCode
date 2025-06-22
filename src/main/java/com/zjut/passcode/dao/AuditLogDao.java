@@ -97,6 +97,21 @@ public class AuditLogDao {
         return logs;
     }
     
+    public List<AuditLog> getAllAuditLogs() {
+        List<AuditLog> logs = new ArrayList<>();
+        String sql = "SELECT * FROM audit_log ORDER BY created_at DESC";
+        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                logs.add(mapResultSetToAuditLog(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return logs;
+    }
+    
     public boolean deleteOldLogs(int daysToKeep) {
         String sql = "DELETE FROM audit_log WHERE created_at < DATE_SUB(NOW(), INTERVAL ? DAY)";
         try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);

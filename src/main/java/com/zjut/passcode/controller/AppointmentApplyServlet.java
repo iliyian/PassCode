@@ -21,7 +21,7 @@ import com.zjut.passcode.util.CryptoUtil;
 public class AppointmentApplyServlet extends HttpServlet {
     private AppointmentDao appointmentDao = new AppointmentDao();
     private AuditLogDao auditLogDao = new AuditLogDao();
-    private static final String ENCRYPTION_KEY = "campus_pass_key_2024";
+    private static final String ENCRYPTION_KEY = "campus_pass_key_";
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -110,7 +110,7 @@ public class AppointmentApplyServlet extends HttpServlet {
             long appointmentId = appointmentDao.addAppointment(appointment);
             if (appointmentId > 0) {
                 // 记录审计日志
-                AuditLog log = new AuditLog(0, visitorName, "预约申请", 
+                AuditLog log = new AuditLog(1, visitorName, "预约申请",
                     "提交预约申请，预约ID: " + appointmentId, ipAddress);
                 log.setHmacSignature(CryptoUtil.generateHmacSm3(log.toString()));
                 auditLogDao.addAuditLog(log);

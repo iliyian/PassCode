@@ -16,7 +16,7 @@ import com.zjut.passcode.util.CryptoUtil;
 @WebServlet("/appointment/query")
 public class AppointmentQueryServlet extends HttpServlet {
     private AppointmentDao appointmentDao = new AppointmentDao();
-    private static final String ENCRYPTION_KEY = "campus_pass_key_2024";
+    private static final String ENCRYPTION_KEY = "campus_pass_key_";
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 

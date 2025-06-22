@@ -148,8 +148,7 @@
         <div class="qr-section">
             <div class="qr-title">📱 扫码预约</div>
             <div class="qr-code">
-                预约通道二维码<br>
-                (200×200px)
+                <img src="${pageContext.request.contextPath}/qrcode?content=${pageContext.request.contextPath}/appointment/apply" alt="预约通道二维码" width="200" height="200"/>
             </div>
             <p style="color: #666; font-size: 0.9em;">
                 扫描二维码进入预约系统<br>

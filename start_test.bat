@@ -37,11 +37,17 @@ echo 系统启动完成！
 echo.
 echo 访问地址:
 echo - 首页: http://localhost:8080/PassCode/
+echo - 登录测试页面: http://localhost:8080/PassCode/login_test.jsp
 echo - 管理员登录: http://localhost:8080/PassCode/admin/login
 echo - 错误测试页面: http://localhost:8080/PassCode/test_error.jsp
 echo.
 echo 测试账号:
 echo - 用户名: admin
 echo - 密码: Admin@123
+echo.
+echo 其他测试账号:
+echo - school_admin / Admin@123
+echo - dept_admin / Admin@123  
+echo - audit_admin / Admin@123
 echo.
 pause 

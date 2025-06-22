@@ -1,9 +1,12 @@
 package com.zjut.passcode.controller;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -11,7 +14,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 import com.zjut.passcode.bean.Appointment;
@@ -21,7 +23,7 @@ import com.zjut.passcode.util.CryptoUtil;
 @WebServlet("/passcode/view")
 public class PassCodeViewServlet extends HttpServlet {
     private AppointmentDao appointmentDao = new AppointmentDao();
-    private static final String ENCRYPTION_KEY = "campus_pass_key_2024";
+    private static final String ENCRYPTION_KEY = "campus_pass_key_";
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -110,16 +112,17 @@ public class PassCodeViewServlet extends HttpServlet {
         try {
             QRCodeWriter qrCodeWriter = new QRCodeWriter();
             BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, 200, 200);
-            
-            // 将BitMatrix转换为Base64编码的图片
-            StringBuilder sb = new StringBuilder();
-            sb.append("data:image/png;base64,");
-            
-            // 这里简化处理，实际项目中应该使用BufferedImage和ImageIO
-            // 为了演示，我们返回一个占位符
-            return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
-            
-        } catch (WriterException e) {
+            BufferedImage image = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
+            for (int x = 0; x < 200; x++) {
+                for (int y = 0; y < 200; y++) {
+                    image.setRGB(x, y, bitMatrix.get(x, y) ? 0xFF000000 : 0xFFFFFFFF);
+                }
+            }
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(image, "png", baos);
+            String base64 = java.util.Base64.getEncoder().encodeToString(baos.toByteArray());
+            return "data:image/png;base64," + base64;
+        } catch (Exception e) {
             e.printStackTrace();
             return "";
         }

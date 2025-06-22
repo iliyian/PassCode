@@ -1,21 +1,27 @@
 package com.zjut.passcode.util;
 
-import java.security.MessageDigest;
 import java.util.Base64;
 
-import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+
+import org.bouncycastle.crypto.digests.SM3Digest;
+import org.bouncycastle.crypto.engines.SM4Engine;
+import org.bouncycastle.crypto.paddings.PKCS7Padding;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 public class CryptoUtil {
     
-    // SM3哈希算法（使用SHA-256作为替代，实际项目中应使用真正的SM3实现）
+    // SM3哈希算法（真正实现）
     public static String sm3Hash(String input) {
         try {
             System.out.println("INFO: Hashing input: " + input);
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(input.getBytes("UTF-8"));
+            SM3Digest digest = new SM3Digest();
+            byte[] inputBytes = input.getBytes("UTF-8");
+            digest.update(inputBytes, 0, inputBytes.length);
+            byte[] hash = new byte[digest.getDigestSize()];
+            digest.doFinal(hash, 0);
             String hashResult = bytesToHex(hash);
             System.out.println("INFO: Hash result: " + hashResult);
             return hashResult;
@@ -27,13 +33,27 @@ public class CryptoUtil {
         }
     }
     
-    // SM4加密（使用AES作为替代，实际项目中应使用真正的SM4实现）
+    // 获取并校验SM4密钥长度
+    private static byte[] getSm4KeyBytes(String key) throws Exception {
+        byte[] keyBytes = key.getBytes("UTF-8");
+        if (keyBytes.length != 16) {
+            throw new IllegalArgumentException("SM4 key must be 16 bytes (128 bits), but got " + keyBytes.length + " bytes");
+        }
+        return keyBytes;
+    }
+    
+    // SM4加密（真正实现，ECB/PKCS7Padding）
     public static String sm4Encrypt(String plaintext, String key) {
         try {
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            byte[] encrypted = cipher.doFinal(plaintext.getBytes("UTF-8"));
+            byte[] keyBytes = getSm4KeyBytes(key);
+            byte[] input = plaintext.getBytes("UTF-8");
+            PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new SM4Engine(), new PKCS7Padding());
+            cipher.init(true, new KeyParameter(keyBytes));
+            byte[] output = new byte[cipher.getOutputSize(input.length)];
+            int len = cipher.processBytes(input, 0, input.length, output, 0);
+            len += cipher.doFinal(output, len);
+            byte[] encrypted = new byte[len];
+            System.arraycopy(output, 0, encrypted, 0, len);
             return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,13 +61,18 @@ public class CryptoUtil {
         }
     }
     
-    // SM4解密
+    // SM4解密（真正实现，ECB/PKCS7Padding）
     public static String sm4Decrypt(String encryptedText, String key) {
         try {
-            SecretKeySpec secretKey = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(encryptedText));
+            byte[] keyBytes = getSm4KeyBytes(key);
+            byte[] input = Base64.getDecoder().decode(encryptedText);
+            PaddedBufferedBlockCipher cipher = new PaddedBufferedBlockCipher(new SM4Engine(), new PKCS7Padding());
+            cipher.init(false, new KeyParameter(keyBytes));
+            byte[] output = new byte[cipher.getOutputSize(input.length)];
+            int len = cipher.processBytes(input, 0, input.length, output, 0);
+            len += cipher.doFinal(output, len);
+            byte[] decrypted = new byte[len];
+            System.arraycopy(output, 0, decrypted, 0, len);
             return new String(decrypted, "UTF-8");
         } catch (Exception e) {
             e.printStackTrace();
