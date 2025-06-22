@@ -1,34 +1,27 @@
 package com.zjut.passcode.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import com.zjut.passcode.bean.Appointment;
 import com.zjut.passcode.bean.AccompanyingPerson;
+import com.zjut.passcode.bean.Appointment;
 
-public class AppointmentDao {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/campus_pass?useSSL=false&serverTimezone=UTC";
-    private static final String DB_USER = "root";
-    private static final String DB_PASSWORD = "351415341";
-    
-    static {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-    
+public class AppointmentDao extends BaseDao {
     public long addAppointment(Appointment appointment) {
         String sql = "INSERT INTO appointment (visitor_name, visitor_id_card, visitor_phone, visitor_unit, campus, entry_time, transport_mode, license_plate, appointment_type, status, official_dept_id, official_contact_person, official_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             pstmt.setString(1, appointment.getVisitorName());
             pstmt.setString(2, appointment.getVisitorIdCard());
             pstmt.setString(3, appointment.getVisitorPhone());
@@ -39,58 +32,61 @@ public class AppointmentDao {
             pstmt.setString(8, appointment.getLicensePlate());
             pstmt.setString(9, appointment.getAppointmentType());
             pstmt.setString(10, appointment.getStatus());
-            
             if (appointment.getOfficialDeptId() != null) {
                 pstmt.setInt(11, appointment.getOfficialDeptId());
             } else {
                 pstmt.setNull(11, java.sql.Types.INTEGER);
             }
-            
             pstmt.setString(12, appointment.getOfficialContactPerson());
             pstmt.setString(13, appointment.getOfficialReason());
-            
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows > 0) {
-                ResultSet rs = pstmt.getGeneratedKeys();
+                rs = pstmt.getGeneratedKeys();
                 if (rs.next()) {
                     long appointmentId = rs.getLong(1);
-                    
-                    // 添加随行人员
                     if (appointment.getAccompanyingPersons() != null) {
                         for (AccompanyingPerson person : appointment.getAccompanyingPersons()) {
                             addAccompanyingPerson(appointmentId, person);
                         }
                     }
-                    
                     return appointmentId;
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(conn, pstmt, rs);
         }
         return -1;
     }
-    
+
     private boolean addAccompanyingPerson(long appointmentId, AccompanyingPerson person) {
         String sql = "INSERT INTO accompanying_person (appointment_id, full_name, id_card, phone) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, appointmentId);
             pstmt.setString(2, person.getFullName());
             pstmt.setString(3, person.getIdCard());
             pstmt.setString(4, person.getPhone());
-            
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(conn, pstmt);
         }
         return false;
     }
-    
+
     public boolean updateAppointment(Appointment appointment) {
         String sql = "UPDATE appointment SET visitor_name=?, visitor_id_card=?, visitor_phone=?, visitor_unit=?, campus=?, entry_time=?, transport_mode=?, license_plate=?, appointment_type=?, status=?, official_dept_id=?, official_contact_person=?, official_reason=? WHERE id=?";
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, appointment.getVisitorName());
             pstmt.setString(2, appointment.getVisitorIdCard());
             pstmt.setString(3, appointment.getVisitorPhone());
@@ -109,59 +105,72 @@ public class AppointmentDao {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            close(conn, pstmt);
         }
     }
-    
+
     public boolean updateAppointmentStatus(long appointmentId, String status, int auditedBy) {
         String sql = "UPDATE appointment SET status = ?, audited_by = ?, audited_at = CURRENT_TIMESTAMP WHERE id = ?";
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, status);
             pstmt.setInt(2, auditedBy);
             pstmt.setLong(3, appointmentId);
-            
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(conn, pstmt);
         }
         return false;
     }
-    
+
     public boolean deleteAppointment(long id) {
         String sql = "DELETE FROM appointment WHERE id=?";
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, id);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } finally {
+            close(conn, pstmt);
         }
     }
-    
+
     public Appointment getAppointmentById(long id) {
         String sql = "SELECT a.*, d.dept_name as official_dept_name, adm.full_name as audited_by_name " +
                     "FROM appointment a " +
                     "LEFT JOIN department d ON a.official_dept_id = d.id " +
                     "LEFT JOIN admin adm ON a.audited_by = adm.id " +
                     "WHERE a.id = ?";
-        
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setLong(1, id);
-            ResultSet rs = pstmt.executeQuery();
-            
+            rs = pstmt.executeQuery();
             if (rs.next()) {
                 return mapResultSetToAppointment(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(conn, pstmt, rs);
         }
         return null;
     }
-    
+
     public List<Appointment> getAppointmentsByVisitor(String visitorName, String encryptedIdCard, String encryptedPhone) {
         String sql = "SELECT a.*, d.dept_name as official_dept_name, adm.full_name as audited_by_name " +
                     "FROM appointment a " +
@@ -169,21 +178,24 @@ public class AppointmentDao {
                     "LEFT JOIN admin adm ON a.audited_by = adm.id " +
                     "WHERE a.visitor_name = ? AND a.visitor_id_card = ? AND a.visitor_phone = ? " +
                     "ORDER BY a.created_at DESC";
-        
         List<Appointment> appointments = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, visitorName);
             pstmt.setString(2, encryptedIdCard);
             pstmt.setString(3, encryptedPhone);
-            
-            ResultSet rs = pstmt.executeQuery();
+            rs = pstmt.executeQuery();
             while (rs.next()) {
                 appointments.add(mapResultSetToAppointment(rs));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            close(conn, pstmt, rs);
         }
         return appointments;
     }
@@ -245,7 +257,7 @@ public class AppointmentDao {
         
         sqlBuilder.append("ORDER BY a.created_at DESC");
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sqlBuilder.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
@@ -274,7 +286,7 @@ public class AppointmentDao {
         
         sqlBuilder.append("ORDER BY a.created_at ASC");
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sqlBuilder.toString())) {
             if ("DEPT_ADMIN".equals(adminRole)) {
                 pstmt.setInt(1, adminDeptId);
@@ -297,7 +309,7 @@ public class AppointmentDao {
                     "ORDER BY a.created_at DESC";
         
         List<Appointment> appointments = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             
@@ -319,7 +331,7 @@ public class AppointmentDao {
                     "ORDER BY a.created_at DESC";
         
         List<Appointment> appointments = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setString(1, status);
@@ -338,7 +350,7 @@ public class AppointmentDao {
         String sql = "SELECT * FROM accompanying_person WHERE appointment_id = ?";
         List<AccompanyingPerson> persons = new ArrayList<>();
         
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+        try (Connection conn = getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setLong(1, appointmentId);
@@ -392,5 +404,102 @@ public class AppointmentDao {
         appointment.setAuditedByName(rs.getString("audited_by_name"));
         
         return appointment;
+    }
+
+    /**
+     * 按申请月度统计预约次数和人次
+     */
+    public List<Map<String, Object>> getStatsByApplyMonth() {
+        String sql = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS count, " +
+                "SUM(1 + (SELECT COUNT(*) FROM accompanying_person ap WHERE ap.appointment_id = a.id)) AS person_count " +
+                "FROM appointment a GROUP BY month ORDER BY month DESC";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("month", rs.getString("month"));
+                map.put("count", rs.getInt("count"));
+                map.put("personCount", rs.getInt("person_count"));
+                result.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 按预约月度统计预约次数和人次
+     */
+    public List<Map<String, Object>> getStatsByEntryMonth() {
+        String sql = "SELECT DATE_FORMAT(entry_time, '%Y-%m') AS month, COUNT(*) AS count, " +
+                "SUM(1 + (SELECT COUNT(*) FROM accompanying_person ap WHERE ap.appointment_id = a.id)) AS person_count " +
+                "FROM appointment a GROUP BY month ORDER BY month DESC";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("month", rs.getString("month"));
+                map.put("count", rs.getInt("count"));
+                map.put("personCount", rs.getInt("person_count"));
+                result.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 按校区统计预约次数和人次
+     */
+    public List<Map<String, Object>> getStatsByCampus() {
+        String sql = "SELECT campus, COUNT(*) AS count, " +
+                "SUM(1 + (SELECT COUNT(*) FROM accompanying_person ap WHERE ap.appointment_id = a.id)) AS person_count " +
+                "FROM appointment a GROUP BY campus ORDER BY count DESC";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("campus", rs.getString("campus"));
+                map.put("count", rs.getInt("count"));
+                map.put("personCount", rs.getInt("person_count"));
+                result.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * 按公务访问部门统计预约次数和人次
+     */
+    public List<Map<String, Object>> getStatsByOfficialDept() {
+        String sql = "SELECT d.dept_name, COUNT(*) AS count, " +
+                "SUM(1 + (SELECT COUNT(*) FROM accompanying_person ap WHERE ap.appointment_id = a.id)) AS person_count " +
+                "FROM appointment a LEFT JOIN department d ON a.official_dept_id = d.id " +
+                "WHERE a.appointment_type = 'OFFICIAL' GROUP BY d.dept_name ORDER BY count DESC";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("deptName", rs.getString("dept_name"));
+                map.put("count", rs.getInt("count"));
+                map.put("personCount", rs.getInt("person_count"));
+                result.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 } 

@@ -11,13 +11,15 @@
     
     List<Admin> admins = (List<Admin>) request.getAttribute("admins");
     Admin currentAdmin = (Admin) request.getAttribute("currentAdmin");
+    
+    String action = request.getParameter("action");
 %>
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>用户管理 - 校园通行码系统</title>
+    <title>管理员管理 - 校园通行码系统</title>
     <style>
         * {
             margin: 0;
@@ -238,7 +240,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="logo">👥 用户管理系统</div>
+        <div class="logo">👤 管理员管理系统</div>
         <div class="user-info">
             <div class="user-name">
                 管理员：<%= currentAdmin.getFullName() %>
@@ -249,65 +251,134 @@
     
     <div class="container">
         <div class="page-title">
-            <div class="title">用户管理</div>
-            <div class="subtitle">管理系统用户和管理员账户</div>
+            <div class="title">管理员管理</div>
+            <div class="subtitle">管理学校和部门管理员信息</div>
         </div>
         
         <div class="users-content">
-            <a href="#" class="add-user-btn">➕ 添加新用户</a>
-            
-            <% if (admins != null && !admins.isEmpty()) { %>
-                <table class="users-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>登录名</th>
-                            <th>姓名</th>
-                            <th>角色</th>
-                            <th>部门</th>
-                            <th>联系电话</th>
-                            <th>最后登录</th>
-                            <th>状态</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% for (Admin user : admins) { %>
-                            <tr>
-                                <td><%= user.getId() %></td>
-                                <td><%= user.getLoginName() %></td>
-                                <td><%= user.getFullName() %></td>
-                                <td>
-                                    <span class="role-badge role-<%= user.getRole().toLowerCase().replace("_", "-") %>">
-                                        <%= getRoleDisplayName(user.getRole()) %>
-                                    </span>
-                                </td>
-                                <td><%= user.getDeptName() != null ? user.getDeptName() : "未分配" %></td>
-                                <td><%= user.getPhone() != null ? user.getPhone() : "未设置" %></td>
-                                <td><%= user.getPasswordLastChanged() != null ? user.getPasswordLastChanged() : "从未登录" %></td>
-                                <td>
-                                    <% if (user.getLockoutUntil() != null) { %>
-                                        <span style="color: #dc3545;">已锁定</span>
-                                    <% } else { %>
-                                        <span style="color: #28a745;">正常</span>
-                                    <% } %>
-                                </td>
-                                <td>
-                                    <a href="#" class="action-btn btn-edit">编辑</a>
-                                    <a href="#" class="action-btn btn-reset-pwd">重置密码</a>
-                                    <% if (user.getId() != currentAdmin.getId()) { %>
-                                        <a href="#" class="action-btn btn-delete">删除</a>
-                                    <% } %>
-                                </td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
+            <% if ("showAddForm".equals(action)) { %>
+                <h2 style="margin-bottom:20px;">添加新管理员</h2>
+                <form method="post" action="<%=request.getContextPath()%>/admin/users">
+                    <input type="hidden" name="action" value="add" />
+                    <div style="margin-bottom:15px;">
+                        <label>登录名：</label>
+                        <input type="text" name="loginName" required style="padding:6px;width:220px;" />
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label>密码：</label>
+                        <input type="password" name="password" required style="padding:6px;width:220px;" />
+                        <span style="color:#888;font-size:0.9em;">密码需8位以上，含数字、大小写字母、特殊字符</span>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label>姓名：</label>
+                        <input type="text" name="fullName" required style="padding:6px;width:220px;" />
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label>部门：</label>
+                        <select name="deptId" style="padding:6px;width:230px;">
+                            <option value="">请选择部门</option>
+                            <% 
+                            List deptList = (List)request.getAttribute("departments");
+                            if (deptList != null) {
+                                for (Object obj : deptList) {
+                                    com.zjut.passcode.bean.Department dept = (com.zjut.passcode.bean.Department)obj;
+                            %>
+                            <option value="<%=dept.getId()%>"><%=dept.getDeptName()%></option>
+                            <%  }} %>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label>联系电话：</label>
+                        <input type="text" name="phone" required style="padding:6px;width:220px;" />
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label>角色：</label>
+                        <select name="role" required style="padding:6px;width:230px;">
+                            <option value="SYSTEM_ADMIN">系统管理员</option>
+                            <option value="SCHOOL_ADMIN">学校管理员</option>
+                            <option value="DEPT_ADMIN">部门管理员</option>
+                            <option value="AUDIT_ADMIN">审计管理员</option>
+                        </select>
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <button type="submit" class="add-user-btn">提交</button>
+                        <a href="<%=request.getContextPath()%>/admin/users" class="back-btn" style="margin-left:10px;">取消</a>
+                    </div>
+                    <% if (request.getAttribute("error") != null) { %>
+                        <div style="color:#dc3545;margin-bottom:10px;">错误：<%=request.getAttribute("error")%></div>
+                    <% } %>
+                    <% if (request.getAttribute("message") != null) { %>
+                        <div style="color:#28a745;margin-bottom:10px;">提示：<%=request.getAttribute("message")%></div>
+                    <% } %>
+                </form>
             <% } else { %>
-                <div class="empty-state">
-                    <h3>暂无用户记录</h3>
-                    <p>当前系统中没有用户记录</p>
-                </div>
+                <a href="${pageContext.request.contextPath}/admin/users?action=showAddForm" class="add-user-btn">➕ 添加新管理员</a>
+                
+                <% if (admins != null && !admins.isEmpty()) { %>
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>登录名</th>
+                                <th>姓名</th>
+                                <th>角色</th>
+                                <th>部门</th>
+                                <th>联系电话</th>
+                                <th>最后登录</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (Admin user : admins) { %>
+                                <tr>
+                                    <td><%= user.getId() %></td>
+                                    <td><%= user.getLoginName() %></td>
+                                    <td><%= user.getFullName() %></td>
+                                    <td>
+                                        <span class="role-badge role-<%= user.getRole().toLowerCase().replace("_", "-") %>">
+                                            <%= getRoleDisplayName(user.getRole()) %>
+                                        </span>
+                                    </td>
+                                    <td><%= user.getDeptName() != null ? user.getDeptName() : "未分配" %></td>
+                                    <td><%= user.getPhone() != null ? user.getPhone() : "未设置" %></td>
+                                    <td><%= user.getPasswordLastChanged() != null ? user.getPasswordLastChanged() : "从未登录" %></td>
+                                    <td>
+                                        <% if (user.getLockoutUntil() != null) { %>
+                                            <span style="color: #dc3545;">已锁定</span>
+                                        <% } else { %>
+                                            <span style="color: #28a745;">正常</span>
+                                        <% } %>
+                                    </td>
+                                    <td>
+                                        <form method="get" action="<%=request.getContextPath()%>/admin/users" style="display:inline;">
+                                            <input type="hidden" name="action" value="editUser" />
+                                            <input type="hidden" name="userId" value="<%= user.getId() %>" />
+                                            <button type="submit" class="action-btn btn-edit">编辑</button>
+                                        </form>
+                                        <form method="get" action="<%=request.getContextPath()%>/admin/users" style="display:inline;">
+                                            <input type="hidden" name="action" value="resetPwd" />
+                                            <input type="hidden" name="userId" value="<%= user.getId() %>" />
+                                            <button type="submit" class="action-btn btn-reset-pwd">重置密码</button>
+                                        </form>
+                                        <% if (user.getId() != currentAdmin.getId()) { %>
+                                            <form method="post" action="<%=request.getContextPath()%>/admin/users" style="display:inline;" onsubmit="return confirmDelete();">
+                                                <input type="hidden" name="action" value="delete" />
+                                                <input type="hidden" name="userId" value="<%= user.getId() %>" />
+                                                <button type="submit" class="action-btn btn-delete">删除</button>
+                                            </form>
+                                        <% } %>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div class="empty-state">
+                        <h3>暂无用户记录</h3>
+                        <p>当前系统中没有用户记录</p>
+                    </div>
+                <% } %>
             <% } %>
         </div>
     </div>
@@ -328,5 +399,10 @@
         }
     }
     %>
+    <script>
+    function confirmDelete() {
+        return confirm('确定要删除该管理员吗？此操作不可恢复！');
+    }
+    </script>
 </body>
 </html> 

@@ -4,7 +4,7 @@
 <%@ page import="java.util.List" %>
 <%
     // Check if admin is logged in
-    Admin admin = (Admin) session.getAttribute("admin");
+    Admin admin = (Admin) request.getSession().getAttribute("admin");
     if (admin == null) {
         response.sendRedirect(request.getContextPath() + "/admin/login");
         return;

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.zjut.passcode.bean.Admin" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%
     // Check if admin is logged in
     Admin admin = (Admin) session.getAttribute("admin");
@@ -335,6 +336,107 @@
                             <td>0%</td>
                             <td style="color: #28a745;">✅ 正常</td>
                         </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 申请月度统计 -->
+            <div class="report-section">
+                <div class="section-title">按申请月度统计</div>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>申请月份</th>
+                            <th>预约次数</th>
+                            <th>预约人次</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="row" items="${applyMonthStats}">
+                            <tr>
+                                <td>${row.month}</td>
+                                <td>${row.count}</td>
+                                <td>${row.personCount}</td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty applyMonthStats}">
+                            <tr><td colspan="3" style="text-align:center;color:#666;">暂无数据</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 预约月度统计 -->
+            <div class="report-section">
+                <div class="section-title">按预约月度统计</div>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>预约月份</th>
+                            <th>预约次数</th>
+                            <th>预约人次</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="row" items="${entryMonthStats}">
+                            <tr>
+                                <td>${row.month}</td>
+                                <td>${row.count}</td>
+                                <td>${row.personCount}</td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty entryMonthStats}">
+                            <tr><td colspan="3" style="text-align:center;color:#666;">暂无数据</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 校区统计 -->
+            <div class="report-section">
+                <div class="section-title">按校区统计</div>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>校区</th>
+                            <th>预约次数</th>
+                            <th>预约人次</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="row" items="${campusStats}">
+                            <tr>
+                                <td>${row.campus}</td>
+                                <td>${row.count}</td>
+                                <td>${row.personCount}</td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty campusStats}">
+                            <tr><td colspan="3" style="text-align:center;color:#666;">暂无数据</td></tr>
+                        </c:if>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 公务访问部门统计 -->
+            <div class="report-section">
+                <div class="section-title">按公务访问部门统计</div>
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>部门</th>
+                            <th>预约次数</th>
+                            <th>预约人次</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <c:forEach var="row" items="${deptStats}">
+                            <tr>
+                                <td>${row.deptName}</td>
+                                <td>${row.count}</td>
+                                <td>${row.personCount}</td>
+                            </tr>
+                        </c:forEach>
+                        <c:if test="${empty deptStats}">
+                            <tr><td colspan="3" style="text-align:center;color:#666;">暂无数据</td></tr>
+                        </c:if>
                     </tbody>
                 </table>
             </div>
