@@ -278,9 +278,9 @@
                         <select name="deptId" style="padding:6px;width:230px;">
                             <option value="">请选择部门</option>
                             <% 
-                            List deptList = (List)request.getAttribute("departments");
-                            if (deptList != null) {
-                                for (Object obj : deptList) {
+                            List departments = (List)request.getAttribute("departments");
+                            if (departments != null) {
+                                for (Object obj : departments) {
                                     com.zjut.passcode.bean.Department dept = (com.zjut.passcode.bean.Department)obj;
                             %>
                             <option value="<%=dept.getId()%>"><%=dept.getDeptName()%></option>
@@ -293,13 +293,38 @@
                     </div>
                     <div style="margin-bottom:15px;">
                         <label>角色：</label>
-                        <select name="role" required style="padding:6px;width:230px;">
+                        <select name="role" id="addRoleSelect" required style="padding:6px;width:230px;">
                             <option value="SYSTEM_ADMIN">系统管理员</option>
                             <option value="SCHOOL_ADMIN">学校管理员</option>
                             <option value="DEPT_ADMIN">部门管理员</option>
                             <option value="AUDIT_ADMIN">审计管理员</option>
                         </select>
                     </div>
+                    <div id="addDeptAdminPerms" style="display:none;margin-bottom:15px;">
+                        <label style="font-weight:bold;">部门管理员权限：</label>
+                        <div style="margin:8px 0 0 10px;">
+                            <input type="checkbox" name="canManagePublicAppointment" value="1" />
+                            <span>可管理本部门社会公众预约</span>
+                        </div>
+                        <div style="margin:8px 0 0 10px;">
+                            <input type="checkbox" name="canReportPublicAppointment" value="1" />
+                            <span>可统计本部门社会公众预约</span>
+                        </div>
+                    </div>
+                    <script>
+                    // 动态显示/隐藏部门管理员权限
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var roleSelect = document.getElementById('addRoleSelect');
+                        var permsDiv = document.getElementById('addDeptAdminPerms');
+                        roleSelect.addEventListener('change', function() {
+                            if (this.value === 'DEPT_ADMIN') {
+                                permsDiv.style.display = 'block';
+                            } else {
+                                permsDiv.style.display = 'none';
+                            }
+                        });
+                    });
+                    </script>
                     <div style="margin-bottom:20px;">
                         <button type="submit" class="add-user-btn">提交</button>
                         <a href="<%=request.getContextPath()%>/admin/users" class="back-btn" style="margin-left:10px;">取消</a>

@@ -139,6 +139,49 @@ public class AuditLogDao extends BaseDao {
         }
     }
     
+    public List<AuditLog> getAuditLogsByPage(int page, int pageSize) {
+        List<AuditLog> logs = new ArrayList<>();
+        String sql = "SELECT * FROM audit_log ORDER BY created_at DESC LIMIT ? OFFSET ?";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, pageSize);
+            pstmt.setInt(2, (page - 1) * pageSize);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                logs.add(mapResultSetToAuditLog(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(conn, pstmt, rs);
+        }
+        return logs;
+    }
+
+    public int getAuditLogsCount() {
+        String sql = "SELECT COUNT(*) FROM audit_log";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(conn, pstmt, rs);
+        }
+        return 0;
+    }
+    
     private AuditLog mapResultSetToAuditLog(ResultSet rs) throws SQLException {
         AuditLog log = new AuditLog();
         log.setId(rs.getLong("id"));

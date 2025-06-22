@@ -502,4 +502,97 @@ public class AppointmentDao extends BaseDao {
         }
         return result;
     }
+
+    // 按申请月度统计（指定部门和类型）
+    public List<Map<String, Object>> getStatsByApplyMonthForDept(int deptId, String type) {
+        String sql = "SELECT DATE_FORMAT(created_at, '%Y-%m') AS month, COUNT(*) AS count, " +
+                "SUM(1 + (SELECT COUNT(*) FROM accompanying_person ap WHERE ap.appointment_id = a.id)) AS person_count " +
+                "FROM appointment a WHERE a.official_dept_id = ? AND a.appointment_type = ? GROUP BY month ORDER BY month DESC";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, deptId);
+            pstmt.setString(2, type);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("month", rs.getString("month"));
+                map.put("count", rs.getInt("count"));
+                map.put("personCount", rs.getInt("person_count"));
+                result.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    // 按预约月度统计（指定部门和类型）
+    public List<Map<String, Object>> getStatsByEntryMonthForDept(int deptId, String type) {
+        String sql = "SELECT DATE_FORMAT(entry_time, '%Y-%m') AS month, COUNT(*) AS count, " +
+                "SUM(1 + (SELECT COUNT(*) FROM accompanying_person ap WHERE ap.appointment_id = a.id)) AS person_count " +
+                "FROM appointment a WHERE a.official_dept_id = ? AND a.appointment_type = ? GROUP BY month ORDER BY month DESC";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, deptId);
+            pstmt.setString(2, type);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("month", rs.getString("month"));
+                map.put("count", rs.getInt("count"));
+                map.put("personCount", rs.getInt("person_count"));
+                result.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    // 按校区统计（指定部门和类型）
+    public List<Map<String, Object>> getStatsByCampusForDept(int deptId, String type) {
+        String sql = "SELECT campus, COUNT(*) AS count, " +
+                "SUM(1 + (SELECT COUNT(*) FROM accompanying_person ap WHERE ap.appointment_id = a.id)) AS person_count " +
+                "FROM appointment a WHERE a.official_dept_id = ? AND a.appointment_type = ? GROUP BY campus ORDER BY count DESC";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, deptId);
+            pstmt.setString(2, type);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("campus", rs.getString("campus"));
+                map.put("count", rs.getInt("count"));
+                map.put("personCount", rs.getInt("person_count"));
+                result.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+    // 按公务访问部门统计（指定部门）
+    public List<Map<String, Object>> getStatsByOfficialDeptForDept(int deptId) {
+        String sql = "SELECT d.dept_name, COUNT(*) AS count, " +
+                "SUM(1 + (SELECT COUNT(*) FROM accompanying_person ap WHERE ap.appointment_id = a.id)) AS person_count " +
+                "FROM appointment a LEFT JOIN department d ON a.official_dept_id = d.id " +
+                "WHERE a.official_dept_id = ? AND a.appointment_type = 'OFFICIAL' GROUP BY d.dept_name ORDER BY count DESC";
+        List<Map<String, Object>> result = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, deptId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("deptName", rs.getString("dept_name"));
+                map.put("count", rs.getInt("count"));
+                map.put("personCount", rs.getInt("person_count"));
+                result.add(map);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 } 

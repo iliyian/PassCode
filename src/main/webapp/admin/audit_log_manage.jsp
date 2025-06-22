@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.zjut.passcode.bean.Admin" %>
+<%@ page import="java.util.List" %>
 <%
     // Check if admin is logged in
     Admin admin = (Admin) session.getAttribute("admin");
@@ -261,33 +262,52 @@
         <div class="audit-content">
             <div class="audit-section">
                 <h3 class="section-title">🔍 最近审计事件</h3>
-                <div class="audit-grid">
-                    <div class="audit-card">
-                        <h4>系统启动</h4>
-                        <p><strong>时间：</strong>2024-01-15 10:00:00</p>
-                        <p><strong>操作者：</strong>系统</p>
-                        <p><strong>IP地址：</strong>127.0.0.1</p>
-                        <span class="status-badge status-info">系统事件</span>
-                    </div>
-                    
-                    <div class="audit-card">
-                        <h4>管理员登录</h4>
-                        <p><strong>时间：</strong>2024-01-15 10:05:00</p>
-                        <p><strong>操作者：</strong><%= admin.getFullName() %></p>
-                        <p><strong>IP地址：</strong>127.0.0.1</p>
-                        <span class="status-badge status-success">登录成功</span>
-                    </div>
-                    
-                    <div class="audit-card">
-                        <h4>数据库连接</h4>
-                        <p><strong>时间：</strong>2024-01-15 10:00:00</p>
-                        <p><strong>操作者：</strong>系统</p>
-                        <p><strong>状态：</strong>连接正常</p>
-                        <span class="status-badge status-success">正常</span>
-                    </div>
+                <%-- 分页表格 --%>
+                <% List auditLogs = (List)request.getAttribute("auditLogs"); %>
+                <% Integer page = (Integer)request.getAttribute("page"); %>
+                <% Integer totalPages = (Integer)request.getAttribute("totalPages"); %>
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>管理员</th>
+                            <th>操作</th>
+                            <th>详情</th>
+                            <th>IP地址</th>
+                            <th>时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (auditLogs != null && !auditLogs.isEmpty()) {
+                            for (Object obj : auditLogs) {
+                                com.zjut.passcode.bean.AuditLog log = (com.zjut.passcode.bean.AuditLog)obj; %>
+                        <tr>
+                            <td><%= log.getId() %></td>
+                            <td><%= log.getAdminName() %></td>
+                            <td><%= log.getAction() %></td>
+                            <td><%= log.getDetails() %></td>
+                            <td><%= log.getIpAddress() %></td>
+                            <td><%= log.getCreatedAt() %></td>
+                        </tr>
+                        <%   }
+                        } else { %>
+                        <tr><td colspan="6" style="text-align:center;">暂无审计日志</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+                <%-- 分页控件 --%>
+                <div style="margin:20px 0;text-align:center;">
+                    <% if (totalPages != null && totalPages > 1) { %>
+                        <% for (int i = 1; i <= totalPages; i++) { %>
+                            <% if (i == page) { %>
+                                <span style="margin:0 5px;font-weight:bold;"><%=i%></span>
+                            <% } else { %>
+                                <a href="?page=<%=i%>" style="margin:0 5px;">[<%=i%>]</a>
+                            <% } %>
+                        <% } %>
+                    <% } %>
                 </div>
             </div>
-            
             <div class="audit-section">
                 <h3 class="section-title">⚠️ 安全警告</h3>
                 <div class="audit-grid">
@@ -298,42 +318,12 @@
                         <p><strong>建议：</strong>请及时修改密码</p>
                         <span class="status-badge status-warning">需要关注</span>
                     </div>
-                    
                     <div class="audit-card">
                         <h4>登录尝试</h4>
                         <p><strong>用户：</strong>unknown_user</p>
                         <p><strong>时间：</strong>2024-01-15 09:55:00</p>
                         <p><strong>结果：</strong>用户不存在</p>
                         <span class="status-badge status-danger">登录失败</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="audit-section">
-                <h3 class="section-title">📈 系统状态</h3>
-                <div class="audit-grid">
-                    <div class="audit-card">
-                        <h4>数据库状态</h4>
-                        <p><strong>连接状态：</strong>正常</p>
-                        <p><strong>响应时间：</strong>15ms</p>
-                        <p><strong>最后检查：</strong>2024-01-15 10:00:00</p>
-                        <span class="status-badge status-success">运行正常</span>
-                    </div>
-                    
-                    <div class="audit-card">
-                        <h4>系统性能</h4>
-                        <p><strong>CPU使用率：</strong>25%</p>
-                        <p><strong>内存使用率：</strong>40%</p>
-                        <p><strong>磁盘使用率：</strong>30%</p>
-                        <span class="status-badge status-success">性能良好</span>
-                    </div>
-                    
-                    <div class="audit-card">
-                        <h4>安全状态</h4>
-                        <p><strong>防火墙：</strong>启用</p>
-                        <p><strong>SSL证书：</strong>有效</p>
-                        <p><strong>安全扫描：</strong>通过</p>
-                        <span class="status-badge status-success">安全</span>
                     </div>
                 </div>
             </div>

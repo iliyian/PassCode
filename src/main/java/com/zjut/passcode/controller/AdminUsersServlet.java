@@ -44,6 +44,8 @@ public class AdminUsersServlet extends HttpServlet {
         }
         
         String action = request.getParameter("action");
+        List<Department> departments = departmentDao.getAllDepartments();
+        request.setAttribute("departments", departments);
         if ("add".equals(action)) {
             showAddForm(request, response);
             return;
@@ -129,6 +131,8 @@ public class AdminUsersServlet extends HttpServlet {
         String deptIdStr = request.getParameter("deptId");
         String phone = request.getParameter("phone");
         String role = request.getParameter("role");
+        boolean canManagePublicAppointment = "1".equals(request.getParameter("canManagePublicAppointment"));
+        boolean canReportPublicAppointment = "1".equals(request.getParameter("canReportPublicAppointment"));
         if (loginName == null || loginName.trim().isEmpty() ||
             password == null || password.trim().isEmpty() ||
             fullName == null || fullName.trim().isEmpty() ||
@@ -159,6 +163,8 @@ public class AdminUsersServlet extends HttpServlet {
             newAdmin.setDeptId(deptIdStr != null && !deptIdStr.trim().isEmpty() ? Integer.parseInt(deptIdStr) : 0);
             newAdmin.setPhone(encryptedPhone);
             newAdmin.setRole(role);
+            newAdmin.setCanManagePublicAppointment(canManagePublicAppointment);
+            newAdmin.setCanReportPublicAppointment(canReportPublicAppointment);
             if (adminDao.addAdmin(newAdmin)) {
                 // 记录审计日志
                 int currentAdminId = admin.getId();
@@ -202,6 +208,8 @@ public class AdminUsersServlet extends HttpServlet {
         String deptIdStr = request.getParameter("deptId");
         String phone = request.getParameter("phone");
         String role = request.getParameter("role");
+        boolean canManagePublicAppointment = "1".equals(request.getParameter("canManagePublicAppointment"));
+        boolean canReportPublicAppointment = "1".equals(request.getParameter("canReportPublicAppointment"));
         if (loginName == null || loginName.trim().isEmpty() ||
             fullName == null || fullName.trim().isEmpty() ||
             phone == null || phone.trim().isEmpty() ||
@@ -221,6 +229,8 @@ public class AdminUsersServlet extends HttpServlet {
         user.setDeptId(deptIdStr != null && !deptIdStr.trim().isEmpty() ? Integer.parseInt(deptIdStr) : 0);
         user.setPhone(phone);
         user.setRole(role);
+        user.setCanManagePublicAppointment(canManagePublicAppointment);
+        user.setCanReportPublicAppointment(canReportPublicAppointment);
         if (adminDao.updateAdmin(user)) {
             request.setAttribute("message", "管理员信息修改成功");
         } else {

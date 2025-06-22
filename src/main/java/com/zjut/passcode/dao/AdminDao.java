@@ -13,7 +13,7 @@ import com.zjut.passcode.bean.Admin;
 
 public class AdminDao extends BaseDao {
     public boolean addAdmin(Admin admin) {
-        String sql = "INSERT INTO admin (login_name, password_hash, full_name, dept_id, phone, role) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO admin (login_name, password_hash, full_name, dept_id, phone, role, can_manage_public_appointment, can_report_public_appointment) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -25,6 +25,8 @@ public class AdminDao extends BaseDao {
             pstmt.setInt(4, admin.getDeptId());
             pstmt.setString(5, admin.getPhone());
             pstmt.setString(6, admin.getRole());
+            pstmt.setBoolean(7, admin.isCanManagePublicAppointment());
+            pstmt.setBoolean(8, admin.isCanReportPublicAppointment());
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -35,7 +37,7 @@ public class AdminDao extends BaseDao {
     }
     
     public boolean updateAdmin(Admin admin) {
-        String sql = "UPDATE admin SET login_name=?, full_name=?, dept_id=?, phone=?, role=? WHERE id=?";
+        String sql = "UPDATE admin SET login_name=?, full_name=?, dept_id=?, phone=?, role=?, can_manage_public_appointment=?, can_report_public_appointment=? WHERE id=?";
         Connection conn = null;
         PreparedStatement pstmt = null;
         try {
@@ -46,7 +48,9 @@ public class AdminDao extends BaseDao {
             pstmt.setInt(3, admin.getDeptId());
             pstmt.setString(4, admin.getPhone());
             pstmt.setString(5, admin.getRole());
-            pstmt.setInt(6, admin.getId());
+            pstmt.setBoolean(6, admin.isCanManagePublicAppointment());
+            pstmt.setBoolean(7, admin.isCanReportPublicAppointment());
+            pstmt.setInt(8, admin.getId());
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -114,6 +118,8 @@ public class AdminDao extends BaseDao {
                 admin.setFailedLoginAttempts(rs.getInt("failed_login_attempts"));
                 admin.setLockoutUntil(rs.getTimestamp("lockout_until"));
                 admin.setDeptName(rs.getString("dept_name"));
+                admin.setCanManagePublicAppointment(rs.getBoolean("can_manage_public_appointment"));
+                admin.setCanReportPublicAppointment(rs.getBoolean("can_report_public_appointment"));
                 return admin;
             }
         } catch (SQLException e) {
@@ -147,6 +153,8 @@ public class AdminDao extends BaseDao {
                 admin.setFailedLoginAttempts(rs.getInt("failed_login_attempts"));
                 admin.setLockoutUntil(rs.getTimestamp("lockout_until"));
                 admin.setDeptName(rs.getString("dept_name"));
+                admin.setCanManagePublicAppointment(rs.getBoolean("can_manage_public_appointment"));
+                admin.setCanReportPublicAppointment(rs.getBoolean("can_report_public_appointment"));
                 return admin;
             }
         } catch (SQLException e) {
@@ -180,6 +188,8 @@ public class AdminDao extends BaseDao {
                 admin.setFailedLoginAttempts(rs.getInt("failed_login_attempts"));
                 admin.setLockoutUntil(rs.getTimestamp("lockout_until"));
                 admin.setDeptName(rs.getString("dept_name"));
+                admin.setCanManagePublicAppointment(rs.getBoolean("can_manage_public_appointment"));
+                admin.setCanReportPublicAppointment(rs.getBoolean("can_report_public_appointment"));
                 admins.add(admin);
             }
         } catch (SQLException e) {

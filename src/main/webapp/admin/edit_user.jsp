@@ -3,7 +3,7 @@
 <%@ page import="java.util.List" %>
 <%
     Admin user = (Admin) request.getAttribute("editUser");
-    List deptList = (List)request.getAttribute("departments");
+    List departments = (List)request.getAttribute("departments");
 %>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -41,7 +41,7 @@
                 <label>部门：</label>
                 <select name="deptId">
                     <option value="">请选择部门</option>
-                    <% if (deptList != null) { for (Object obj : deptList) { com.zjut.passcode.bean.Department dept = (com.zjut.passcode.bean.Department)obj; %>
+                    <% if (departments != null) { for (Object obj : departments) { com.zjut.passcode.bean.Department dept = (com.zjut.passcode.bean.Department)obj; %>
                         <option value="<%=dept.getId()%>" <%=dept.getId()==user.getDeptId()?"selected":""%>><%=dept.getDeptName()%></option>
                     <% }} %>
                 </select>
@@ -59,6 +59,31 @@
                     <option value="AUDIT_ADMIN" <%= "AUDIT_ADMIN".equals(user.getRole())?"selected":""%>>审计管理员</option>
                 </select>
             </div>
+            <div id="deptAdminPerms" style="display:<%= "DEPT_ADMIN".equals(user.getRole()) ? "block" : "none" %>;margin-bottom:20px;">
+                <label style="font-weight:bold;">部门管理员权限：</label>
+                <div style="margin:8px 0 0 10px;">
+                    <input type="checkbox" name="canManagePublicAppointment" value="1" <%= user.isCanManagePublicAppointment() ? "checked" : "" %> />
+                    <span>可管理本部门社会公众预约</span>
+                </div>
+                <div style="margin:8px 0 0 10px;">
+                    <input type="checkbox" name="canReportPublicAppointment" value="1" <%= user.isCanReportPublicAppointment() ? "checked" : "" %> />
+                    <span>可统计本部门社会公众预约</span>
+                </div>
+            </div>
+            <script>
+            // 动态显示/隐藏部门管理员权限
+            document.addEventListener('DOMContentLoaded', function() {
+                var roleSelect = document.querySelector('select[name="role"]');
+                var permsDiv = document.getElementById('deptAdminPerms');
+                roleSelect.addEventListener('change', function() {
+                    if (this.value === 'DEPT_ADMIN') {
+                        permsDiv.style.display = 'block';
+                    } else {
+                        permsDiv.style.display = 'none';
+                    }
+                });
+            });
+            </script>
             <% if (request.getAttribute("error") != null) { %>
                 <div class="error">错误：<%=request.getAttribute("error")%></div>
             <% } %>

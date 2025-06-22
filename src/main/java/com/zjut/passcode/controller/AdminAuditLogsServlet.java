@@ -33,14 +33,30 @@ public class AdminAuditLogsServlet extends HttpServlet {
         System.out.println("INFO: Admin audit logs page accessed by: " + admin.getLoginName());
         
         try {
-            // Get all audit logs
-            List<AuditLog> auditLogs = auditLogDao.getAllAuditLogs();
-            System.out.println("INFO: Retrieved " + auditLogs.size() + " audit logs");
-            
+            // 分页参数
+            int page = 1;
+            int pageSize = 20;
+            String pageParam = request.getParameter("page");
+            if (pageParam != null) {
+                try { page = Integer.parseInt(pageParam); } catch (NumberFormatException ignored) {}
+            }
+            String pageSizeParam = request.getParameter("pageSize");
+            if (pageSizeParam != null) {
+                try { pageSize = Integer.parseInt(pageSizeParam); } catch (NumberFormatException ignored) {}
+            }
+            int totalLogs = auditLogDao.getAuditLogsCount();
+            int totalPages = (int)Math.ceil((double)totalLogs / pageSize);
+            if (page < 1) page = 1;
+            if (page > totalPages && totalPages > 0) page = totalPages;
+            // 分页查询
+            List<AuditLog> auditLogs = auditLogDao.getAuditLogsByPage(page, pageSize);
             // Set attributes for JSP
             request.setAttribute("auditLogs", auditLogs);
             request.setAttribute("admin", admin);
-            
+            request.setAttribute("page", page);
+            request.setAttribute("pageSize", pageSize);
+            request.setAttribute("totalLogs", totalLogs);
+            request.setAttribute("totalPages", totalPages);
             // Forward to audit logs page
             request.getRequestDispatcher("/admin/audit_logs.jsp").forward(request, response);
             

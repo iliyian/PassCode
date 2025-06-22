@@ -1,5 +1,6 @@
 -- 校园通行码预约管理系统数据库初始化脚本
 -- 创建数据库
+DROP DATABASE IF EXISTS campus_pass;
 CREATE DATABASE IF NOT EXISTS campus_pass DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE campus_pass;
 
@@ -26,6 +27,8 @@ CREATE TABLE `admin` (
   `password_last_changed` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '密码最后修改时间',
   `failed_login_attempts` INT DEFAULT 0 COMMENT '连续登录失败次数',
   `lockout_until` TIMESTAMP NULL COMMENT '账户锁定截止时间',
+  `can_manage_public_appointment` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '能否管理社会公众预约',
+  `can_report_public_appointment` TINYINT(1) NOT NULL DEFAULT 0 COMMENT '能否统计社会公众预约',
   PRIMARY KEY (`id`),
   FOREIGN KEY (`dept_id`, `dept_no`, `dept_name`) REFERENCES `department`(`id`, `dept_no`, `dept_name`)
 ) COMMENT='管理员信息表';
@@ -83,33 +86,30 @@ CREATE TABLE `audit_log` (
 
 -- 插入初始数据
 
--- 插入部门数据
-INSERT INTO `department` (`dept_no`, `dept_name`, `dept_type`) VALUES
-('D001', '计算机学院', '学院'),
-('D002', '机械工程学院', '学院'),
-('D003', '化学工程学院', '学院'),
-('D004', '信息工程学院', '学院'),
-('D005', '经济学院', '学院'),
-('D006', '管理学院', '学院'),
-('D007', '理学院', '学院'),
-('D008', '外国语学院', '学院'),
-('D009', '人文学院', '学院'),
-('D010', '艺术学院', '学院'),
-('D101', '校长办公室', '行政部门'),
-('D102', '教务处', '行政部门'),
-('D103', '学生处', '行政部门'),
-('D104', '人事处', '行政部门'),
-('D105', '财务处', '行政部门'),
-('D201', '图书馆', '直属部门'),
-('D202', '信息中心', '直属部门'),
-('D203', '后勤集团', '直属部门');
+-- 先清空表，避免重复插入导致外键冲突
+# DELETE FROM admin;
+# DELETE FROM department;
 
--- 插入系统管理员（密码：Admin@123，使用SHA-256哈希）
-INSERT INTO `admin` (`login_name`, `password_hash`, `full_name`, `dept_id`, `phone`, `role`) VALUES
-('admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '系统管理员', 1, 'encrypted_phone_1', 'SYSTEM_ADMIN'),
-('school_admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '学校管理员', 1, 'encrypted_phone_2', 'SCHOOL_ADMIN'),
-('dept_admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '部门管理员', 1, 'encrypted_phone_3', 'DEPT_ADMIN'),
-('audit_admin', 'e86f78a8a3caf0b60d8e74e5942aa6d86dc150cd3c03338aef25b7d2d7e3acc7', '审计管理员', 1, 'encrypted_phone_4', 'AUDIT_ADMIN');
+-- 先插入 department
+INSERT INTO `department` (`id`, `dept_no`, `dept_name`, `dept_type`) VALUES
+(1, 'D001', '计算机学院', '学院'),
+(2, 'D002', '机械工程学院', '学院'),
+(14, 'D104', '人事处', '行政部门'),
+(17, 'D201', '图书馆', '直属部门'),
+(100, 'SYS', '系统', '直属部门'),
+(101, 'AUD', '审计', '直属部门'),
+(102, 'SCH', '学校', '直属部门');
+
+-- 再插入 admin
+INSERT INTO `admin` (`login_name`, `password_hash`, `full_name`, `dept_id`, `dept_no`, `dept_name`, `phone`, `role`, `can_manage_public_appointment`, `can_report_public_appointment`)
+VALUES
+('admin_cs', 'c4039a5810e67a8b1eb72cc2b9d9f2e55ca0e2fd2b84f55e212ad3a23aec89bc', '计算机学院管理员', 1, 'D001', '计算机学院', 'encrypted_phone_5', 'DEPT_ADMIN', 1, 1),
+('admin_me', 'c4039a5810e67a8b1eb72cc2b9d9f2e55ca0e2fd2b84f55e212ad3a23aec89bc', '机械工程学院管理员', 2, 'D002', '机械工程学院', 'encrypted_phone_6', 'DEPT_ADMIN', 0, 1),
+('admin_hr', 'c4039a5810e67a8b1eb72cc2b9d9f2e55ca0e2fd2b84f55e212ad3a23aec89bc', '人事处管理员', 14, 'D104', '人事处', 'encrypted_phone_7', 'DEPT_ADMIN', 1, 0),
+('admin_lib', 'c4039a5810e67a8b1eb72cc2b9d9f2e55ca0e2fd2b84f55e212ad3a23aec89bc', '图书馆管理员', 17, 'D201', '图书馆', 'encrypted_phone_8', 'DEPT_ADMIN', 0, 0),
+('admin_sys', 'c4039a5810e67a8b1eb72cc2b9d9f2e55ca0e2fd2b84f55e212ad3a23aec89bc', '系统管理员', 100, 'SYS', '系统', 'encrypted_phone_sys', 'SYSTEM_ADMIN', 1, 1),
+('admin_audit', 'c4039a5810e67a8b1eb72cc2b9d9f2e55ca0e2fd2b84f55e212ad3a23aec89bc', '审计管理员', 101, 'AUD', '审计', 'encrypted_phone_audit', 'AUDIT_ADMIN', 0, 0),
+('admin_school', 'c4039a5810e67a8b1eb72cc2b9d9f2e55ca0e2fd2b84f55e212ad3a23aec89bc', '学校管理员', 102, 'SCH', '学校', 'encrypted_phone_school', 'SCHOOL_ADMIN', 1, 1);
 
 -- 创建索引
 CREATE INDEX idx_appointment_visitor ON `appointment` (`visitor_name`, `visitor_id_card`, `visitor_phone`);
@@ -122,15 +122,18 @@ CREATE INDEX idx_audit_log_created_at ON `audit_log` (`created_at`);
 CREATE INDEX idx_admin_login_name ON `admin` (`login_name`);
 CREATE INDEX idx_admin_role ON `admin` (`role`);
 
--- 创建视图
-CREATE VIEW v_appointment_detail AS
-SELECT 
-    a.*,
-    d.dept_name as official_dept_name,
-    adm.full_name as audited_by_name
-FROM appointment a
-LEFT JOIN department d ON a.official_dept_id = d.id
-LEFT JOIN admin adm ON a.audited_by = adm.id;
+-- 1. 先ALTER TABLE appointment DROP COLUMN official_dept_name;
+# ALTER TABLE appointment DROP COLUMN official_dept_name;
+
+-- 2. 再创建视图
+-- CREATE VIEW v_appointment_detail AS
+-- SELECT 
+--     a.*,
+--     d.dept_name as official_dept_name,
+--     adm.full_name as audited_by_name
+-- FROM appointment a
+-- LEFT JOIN department d ON a.official_dept_id = d.id
+-- LEFT JOIN admin adm ON a.audited_by = adm.id;
 
 -- 创建存储过程：清理过期日志
 DELIMITER //

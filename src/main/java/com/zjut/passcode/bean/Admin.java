@@ -14,6 +14,8 @@ public class Admin {
     private int failedLoginAttempts;
     private Timestamp lockoutUntil;
     private String deptName; // 用于显示
+    private boolean canManagePublicAppointment;
+    private boolean canReportPublicAppointment;
     
     public Admin() {}
     
@@ -112,5 +114,21 @@ public class Admin {
     
     public void setDeptName(String deptName) {
         this.deptName = deptName;
+    }
+    
+    public boolean isCanManagePublicAppointment() {
+        return canManagePublicAppointment;
+    }
+    
+    public void setCanManagePublicAppointment(boolean canManagePublicAppointment) {
+        this.canManagePublicAppointment = canManagePublicAppointment;
+    }
+    
+    public boolean isCanReportPublicAppointment() {
+        return canReportPublicAppointment;
+    }
+    
+    public void setCanReportPublicAppointment(boolean canReportPublicAppointment) {
+        this.canReportPublicAppointment = canReportPublicAppointment;
     }
 } 
