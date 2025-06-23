@@ -7,7 +7,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class BaseDao {
-    private static final String DB_URL = "jdbc:mysql://154.17.12.93:3306/campus_pass?useSSL=true&serverTimezone=UTC";
+    private static final String DB_URL = "jdbc:mysql://114.55.219.20:3306/campus_pass?useSSL=true&serverTimezone=UTC";
     private static final String DB_USER = "passcode";
     private static final String DB_PASSWORD = "351415341";
 
