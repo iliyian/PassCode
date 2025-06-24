@@ -1,6 +1,7 @@
 package com.zjut.passcode.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -60,8 +61,18 @@ public class AdminUsersServlet extends HttpServlet {
         System.out.println("INFO: Admin users page accessed by: " + admin.getLoginName());
         
         try {
-            // Get all admins
-            List<Admin> admins = adminDao.getAllAdmins();
+            // Get admins based on current admin's role
+            List<Admin> admins;
+            if ("SYSTEM_ADMIN".equals(adminRole)) {
+                // 系统管理员可以查看所有管理员
+                admins = adminDao.getAllAdmins();
+            } else if ("SCHOOL_ADMIN".equals(adminRole)) {
+                // 学校管理员只能查看部门管理员
+                admins = adminDao.getAdminsByRole("DEPT_ADMIN");
+            } else {
+                admins = new ArrayList<>();
+            }
+            
             System.out.println("INFO: Retrieved " + admins.size() + " admin users");
             
             // Set attributes for JSP
@@ -125,6 +136,7 @@ public class AdminUsersServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         Admin admin = (Admin) request.getSession().getAttribute("admin");
+        String adminRole = admin.getRole();
         String loginName = request.getParameter("loginName");
         String password = request.getParameter("password");
         String fullName = request.getParameter("fullName");
@@ -133,6 +145,14 @@ public class AdminUsersServlet extends HttpServlet {
         String role = request.getParameter("role");
         boolean canManagePublicAppointment = "1".equals(request.getParameter("canManagePublicAppointment"));
         boolean canReportPublicAppointment = "1".equals(request.getParameter("canReportPublicAppointment"));
+        
+        // 权限检查：学校管理员只能添加部门管理员
+        if ("SCHOOL_ADMIN".equals(adminRole) && !"DEPT_ADMIN".equals(role)) {
+            request.setAttribute("error", "学校管理员只能添加部门管理员");
+            showAddForm(request, response);
+            return;
+        }
+        
         if (loginName == null || loginName.trim().isEmpty() ||
             password == null || password.trim().isEmpty() ||
             fullName == null || fullName.trim().isEmpty() ||
@@ -187,11 +207,29 @@ public class AdminUsersServlet extends HttpServlet {
             throws ServletException, IOException {
         int userId = Integer.parseInt(request.getParameter("userId"));
         Admin currentAdmin = (Admin) request.getSession().getAttribute("admin");
+        String adminRole = currentAdmin.getRole();
+        
         if (userId == currentAdmin.getId()) {
             request.setAttribute("error", "不能删除自己");
             doGet(request, response);
             return;
         }
+        
+        // 获取要删除的用户信息
+        Admin userToDelete = adminDao.getAdminById(userId);
+        if (userToDelete == null) {
+            request.setAttribute("error", "用户不存在");
+            doGet(request, response);
+            return;
+        }
+        
+        // 权限检查：学校管理员只能删除部门管理员
+        if ("SCHOOL_ADMIN".equals(adminRole) && !"DEPT_ADMIN".equals(userToDelete.getRole())) {
+            request.setAttribute("error", "学校管理员只能删除部门管理员");
+            doGet(request, response);
+            return;
+        }
+        
         if (adminDao.deleteAdmin(userId)) {
             request.setAttribute("message", "管理员删除成功");
         } else {
@@ -203,6 +241,8 @@ public class AdminUsersServlet extends HttpServlet {
     private void editAdmin(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int userId = Integer.parseInt(request.getParameter("userId"));
+        Admin currentAdmin = (Admin) request.getSession().getAttribute("admin");
+        String adminRole = currentAdmin.getRole();
         String loginName = request.getParameter("loginName");
         String fullName = request.getParameter("fullName");
         String deptIdStr = request.getParameter("deptId");
@@ -210,6 +250,29 @@ public class AdminUsersServlet extends HttpServlet {
         String role = request.getParameter("role");
         boolean canManagePublicAppointment = "1".equals(request.getParameter("canManagePublicAppointment"));
         boolean canReportPublicAppointment = "1".equals(request.getParameter("canReportPublicAppointment"));
+        
+        // 获取要编辑的用户信息
+        Admin user = adminDao.getAdminById(userId);
+        if (user == null) {
+            request.setAttribute("error", "用户不存在");
+            doGet(request, response);
+            return;
+        }
+        
+        // 权限检查：学校管理员只能编辑部门管理员，且不能改变角色
+        if ("SCHOOL_ADMIN".equals(adminRole)) {
+            if (!"DEPT_ADMIN".equals(user.getRole())) {
+                request.setAttribute("error", "学校管理员只能编辑部门管理员");
+                doGet(request, response);
+                return;
+            }
+            if (!"DEPT_ADMIN".equals(role)) {
+                request.setAttribute("error", "学校管理员不能将部门管理员改为其他角色");
+                doGet(request, response);
+                return;
+            }
+        }
+        
         if (loginName == null || loginName.trim().isEmpty() ||
             fullName == null || fullName.trim().isEmpty() ||
             phone == null || phone.trim().isEmpty() ||
@@ -218,12 +281,7 @@ public class AdminUsersServlet extends HttpServlet {
             request.getRequestDispatcher("/admin/edit_user.jsp?userId=" + userId).forward(request, response);
             return;
         }
-        Admin user = adminDao.getAdminById(userId);
-        if (user == null) {
-            request.setAttribute("error", "用户不存在");
-            doGet(request, response);
-            return;
-        }
+        
         user.setLoginName(loginName);
         user.setFullName(fullName);
         user.setDeptId(deptIdStr != null && !deptIdStr.trim().isEmpty() ? Integer.parseInt(deptIdStr) : 0);

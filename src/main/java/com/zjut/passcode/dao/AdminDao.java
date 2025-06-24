@@ -200,6 +200,42 @@ public class AdminDao extends BaseDao {
         return admins;
     }
     
+    public List<Admin> getAdminsByRole(String role) {
+        List<Admin> admins = new ArrayList<>();
+        String sql = "SELECT a.*, d.dept_name FROM admin a LEFT JOIN department d ON a.dept_id = d.id WHERE a.role=? ORDER BY a.id";
+        Connection conn = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        try {
+            conn = getConnection();
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, role);
+            rs = pstmt.executeQuery();
+            while (rs.next()) {
+                Admin admin = new Admin();
+                admin.setId(rs.getInt("id"));
+                admin.setLoginName(rs.getString("login_name"));
+                admin.setPasswordHash(rs.getString("password_hash"));
+                admin.setFullName(rs.getString("full_name"));
+                admin.setDeptId(rs.getInt("dept_id"));
+                admin.setPhone(rs.getString("phone"));
+                admin.setRole(rs.getString("role"));
+                admin.setPasswordLastChanged(rs.getTimestamp("password_last_changed"));
+                admin.setFailedLoginAttempts(rs.getInt("failed_login_attempts"));
+                admin.setLockoutUntil(rs.getTimestamp("lockout_until"));
+                admin.setDeptName(rs.getString("dept_name"));
+                admin.setCanManagePublicAppointment(rs.getBoolean("can_manage_public_appointment"));
+                admin.setCanReportPublicAppointment(rs.getBoolean("can_report_public_appointment"));
+                admins.add(admin);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            close(conn, pstmt, rs);
+        }
+        return admins;
+    }
+    
     public boolean updateFailedLoginAttempts(int adminId, int attempts) {
         String sql = "UPDATE admin SET failed_login_attempts=? WHERE id=?";
         Connection conn = null;

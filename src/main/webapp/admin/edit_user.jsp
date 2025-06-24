@@ -3,7 +3,9 @@
 <%@ page import="java.util.List" %>
 <%
     Admin user = (Admin) request.getAttribute("editUser");
+    Admin currentAdmin = (Admin) session.getAttribute("admin");
     List departments = (List)request.getAttribute("departments");
+    boolean isRoleDisabled = "SCHOOL_ADMIN".equals(currentAdmin.getRole()) && "DEPT_ADMIN".equals(user.getRole());
 %>
 <!DOCTYPE html>
 <html lang="zh-CN">
@@ -21,6 +23,7 @@
         .btn-cancel { background: #6c757d; margin-left: 10px; }
         .error { color: #dc3545; margin-bottom: 10px; }
         .message { color: #28a745; margin-bottom: 10px; }
+        .disabled { background-color: #f8f9fa; color: #6c757d; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -52,12 +55,24 @@
             </div>
             <div>
                 <label>角色：</label>
-                <select name="role" required>
-                    <option value="SYSTEM_ADMIN" <%= "SYSTEM_ADMIN".equals(user.getRole())?"selected":""%>>系统管理员</option>
-                    <option value="SCHOOL_ADMIN" <%= "SCHOOL_ADMIN".equals(user.getRole())?"selected":""%>>学校管理员</option>
-                    <option value="DEPT_ADMIN" <%= "DEPT_ADMIN".equals(user.getRole())?"selected":""%>>部门管理员</option>
-                    <option value="AUDIT_ADMIN" <%= "AUDIT_ADMIN".equals(user.getRole())?"selected":""%>>审计管理员</option>
+                <% if (isRoleDisabled) { %>
+                    <select name="role" required disabled>
+                <% } else { %>
+                    <select name="role" required>
+                <% } %>
+                    <% if ("SYSTEM_ADMIN".equals(currentAdmin.getRole())) { %>
+                        <option value="SYSTEM_ADMIN" <%= "SYSTEM_ADMIN".equals(user.getRole())?"selected":""%>>系统管理员</option>
+                        <option value="SCHOOL_ADMIN" <%= "SCHOOL_ADMIN".equals(user.getRole())?"selected":""%>>学校管理员</option>
+                        <option value="DEPT_ADMIN" <%= "DEPT_ADMIN".equals(user.getRole())?"selected":""%>>部门管理员</option>
+                        <option value="AUDIT_ADMIN" <%= "AUDIT_ADMIN".equals(user.getRole())?"selected":""%>>审计管理员</option>
+                    <% } else if ("SCHOOL_ADMIN".equals(currentAdmin.getRole())) { %>
+                        <option value="DEPT_ADMIN" <%= "DEPT_ADMIN".equals(user.getRole())?"selected":""%>>部门管理员</option>
+                    <% } %>
                 </select>
+                <% if (isRoleDisabled) { %>
+                    <input type="hidden" name="role" value="DEPT_ADMIN" />
+                    <small style="color: #6c757d;">学校管理员不能改变部门管理员的角色</small>
+                <% } %>
             </div>
             <div id="deptAdminPerms" style="display:<%= "DEPT_ADMIN".equals(user.getRole()) ? "block" : "none" %>;margin-bottom:20px;">
                 <label style="font-weight:bold;">部门管理员权限：</label>
@@ -75,13 +90,15 @@
             document.addEventListener('DOMContentLoaded', function() {
                 var roleSelect = document.querySelector('select[name="role"]');
                 var permsDiv = document.getElementById('deptAdminPerms');
-                roleSelect.addEventListener('change', function() {
-                    if (this.value === 'DEPT_ADMIN') {
-                        permsDiv.style.display = 'block';
-                    } else {
-                        permsDiv.style.display = 'none';
-                    }
-                });
+                if (roleSelect && !roleSelect.disabled) {
+                    roleSelect.addEventListener('change', function() {
+                        if (this.value === 'DEPT_ADMIN') {
+                            permsDiv.style.display = 'block';
+                        } else {
+                            permsDiv.style.display = 'none';
+                        }
+                    });
+                }
             });
             </script>
             <% if (request.getAttribute("error") != null) { %>

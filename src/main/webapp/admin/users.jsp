@@ -294,10 +294,14 @@
                     <div style="margin-bottom:15px;">
                         <label>角色：</label>
                         <select name="role" id="addRoleSelect" required style="padding:6px;width:230px;">
-                            <option value="SYSTEM_ADMIN">系统管理员</option>
-                            <option value="SCHOOL_ADMIN">学校管理员</option>
-                            <option value="DEPT_ADMIN">部门管理员</option>
-                            <option value="AUDIT_ADMIN">审计管理员</option>
+                            <% if ("SYSTEM_ADMIN".equals(currentAdmin.getRole())) { %>
+                                <option value="SYSTEM_ADMIN">系统管理员</option>
+                                <option value="SCHOOL_ADMIN">学校管理员</option>
+                                <option value="DEPT_ADMIN">部门管理员</option>
+                                <option value="AUDIT_ADMIN">审计管理员</option>
+                            <% } else if ("SCHOOL_ADMIN".equals(currentAdmin.getRole())) { %>
+                                <option value="DEPT_ADMIN">部门管理员</option>
+                            <% } %>
                         </select>
                     </div>
                     <div id="addDeptAdminPerms" style="display:none;margin-bottom:15px;">
