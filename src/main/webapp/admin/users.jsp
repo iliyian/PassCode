@@ -304,11 +304,11 @@
                         <label style="font-weight:bold;">部门管理员权限：</label>
                         <div style="margin:8px 0 0 10px;">
                             <input type="checkbox" name="canManagePublicAppointment" value="1" />
-                            <span>可管理本部门社会公众预约</span>
+                            <span>可管理本部门社会公众预约（默认只能管理公务预约）</span>
                         </div>
                         <div style="margin:8px 0 0 10px;">
                             <input type="checkbox" name="canReportPublicAppointment" value="1" />
-                            <span>可统计本部门社会公众预约</span>
+                            <span>可统计本部门社会公众预约（默认只能统计公务预约）</span>
                         </div>
                     </div>
                     <script>

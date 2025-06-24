@@ -270,12 +270,24 @@
                 <a href="${pageContext.request.contextPath}/admin/appointments" class="action-card">
                     <div class="action-icon">📋</div>
                     <div class="action-title">预约管理</div>
-                    <div class="action-description">仅能管理本部门社会公众预约，管理公务预约需学校管理员授权</div>
+                    <div class="action-description">
+                        <% if (admin.isCanManagePublicAppointment()) { %>
+                            管理本部门公务预约和社会公众预约
+                        <% } else { %>
+                            仅能管理本部门公务预约
+                        <% } %>
+                    </div>
                 </a>
                 <a href="${pageContext.request.contextPath}/admin/reports" class="action-card">
                     <div class="action-icon">📈</div>
                     <div class="action-title">统计报告</div>
-                    <div class="action-description">查看系统使用统计和报告</div>
+                    <div class="action-description">
+                        <% if (admin.isCanReportPublicAppointment()) { %>
+                            查看本部门公务预约和社会公众预约统计
+                        <% } else { %>
+                            查看本部门公务预约统计
+                        <% } %>
+                    </div>
                 </a>
             <% } else { %>
                 <a href="${pageContext.request.contextPath}/admin/appointments" class="action-card">

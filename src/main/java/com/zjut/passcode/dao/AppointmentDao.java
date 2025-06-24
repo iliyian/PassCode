@@ -641,4 +641,64 @@ public class AppointmentDao extends BaseDao {
         }
         return result;
     }
+
+    /**
+     * 根据部门ID获取该部门的所有预约（包括公务预约和社会公众预约）
+     * @param deptId 部门ID
+     * @return 预约列表
+     */
+    public List<Appointment> getAppointmentsByDept(int deptId) {
+        String sql = "SELECT a.*, d.dept_name as official_dept_name, adm.full_name as audited_by_name " +
+                    "FROM appointment a " +
+                    "LEFT JOIN department d ON a.official_dept_id = d.id " +
+                    "LEFT JOIN admin adm ON a.audited_by = adm.id " +
+                    "WHERE a.official_dept_id = ? OR a.appointment_type = 'PUBLIC' " +
+                    "ORDER BY a.created_at DESC";
+        
+        List<Appointment> appointments = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, deptId);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                appointments.add(mapResultSetToAppointment(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return appointments;
+    }
+
+    /**
+     * 根据部门ID和预约类型获取预约列表
+     * @param deptId 部门ID
+     * @param appointmentType 预约类型
+     * @return 预约列表
+     */
+    public List<Appointment> getAppointmentsByDeptAndType(int deptId, String appointmentType) {
+        String sql = "SELECT a.*, d.dept_name as official_dept_name, adm.full_name as audited_by_name " +
+                    "FROM appointment a " +
+                    "LEFT JOIN department d ON a.official_dept_id = d.id " +
+                    "LEFT JOIN admin adm ON a.audited_by = adm.id " +
+                    "WHERE a.official_dept_id = ? AND a.appointment_type = ? " +
+                    "ORDER BY a.created_at DESC";
+        
+        List<Appointment> appointments = new ArrayList<>();
+        try (Connection conn = getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setInt(1, deptId);
+            pstmt.setString(2, appointmentType);
+            ResultSet rs = pstmt.executeQuery();
+            
+            while (rs.next()) {
+                appointments.add(mapResultSetToAppointment(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return appointments;
+    }
 } 

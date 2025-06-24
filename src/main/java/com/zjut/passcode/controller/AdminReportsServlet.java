@@ -49,14 +49,9 @@ public class AdminReportsServlet extends HttpServlet {
             campusStats = appointmentDao.getStatsByCampus();
             deptStats = appointmentDao.getStatsByOfficialDept();
         } else if ("DEPT_ADMIN".equals(role)) {
-            if (!canReportPublic) {
-                // 只允许统计本部门公务预约
-                applyMonthStats = appointmentDao.getStatsByApplyMonthForDept(admin.getDeptId(), "OFFICIAL");
-                entryMonthStats = appointmentDao.getStatsByEntryMonthForDept(admin.getDeptId(), "OFFICIAL");
-                campusStats = appointmentDao.getStatsByCampusForDept(admin.getDeptId(), "OFFICIAL");
-                deptStats = appointmentDao.getStatsByOfficialDeptForDept(admin.getDeptId());
-            } else {
-                // 可统计本部门所有预约
+            // 部门管理员根据权限统计预约
+            if (canReportPublic) {
+                // 可以统计社会公众预约，统计本部门所有预约
                 applyMonthStats = appointmentDao.getStatsByApplyMonthForDept(admin.getDeptId(), "PUBLIC");
                 List<Map<String, Object>> officialApply = appointmentDao.getStatsByApplyMonthForDept(admin.getDeptId(), "OFFICIAL");
                 applyMonthStats.addAll(officialApply);
@@ -66,6 +61,12 @@ public class AdminReportsServlet extends HttpServlet {
                 campusStats = appointmentDao.getStatsByCampusForDept(admin.getDeptId(), "PUBLIC");
                 List<Map<String, Object>> officialCampus = appointmentDao.getStatsByCampusForDept(admin.getDeptId(), "OFFICIAL");
                 campusStats.addAll(officialCampus);
+                deptStats = appointmentDao.getStatsByOfficialDeptForDept(admin.getDeptId());
+            } else {
+                // 只能统计公务预约
+                applyMonthStats = appointmentDao.getStatsByApplyMonthForDept(admin.getDeptId(), "OFFICIAL");
+                entryMonthStats = appointmentDao.getStatsByEntryMonthForDept(admin.getDeptId(), "OFFICIAL");
+                campusStats = appointmentDao.getStatsByCampusForDept(admin.getDeptId(), "OFFICIAL");
                 deptStats = appointmentDao.getStatsByOfficialDeptForDept(admin.getDeptId());
             }
         } else {
