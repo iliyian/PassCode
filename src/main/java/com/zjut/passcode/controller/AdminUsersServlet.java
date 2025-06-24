@@ -301,18 +301,45 @@ public class AdminUsersServlet extends HttpServlet {
             throws ServletException, IOException {
         int userId = Integer.parseInt(request.getParameter("userId"));
         String newPassword = request.getParameter("newPassword");
+        String confirmPassword = request.getParameter("confirmPassword");
+        
+        // 基本验证：密码不能为空
         if (newPassword == null || newPassword.trim().isEmpty()) {
             request.setAttribute("error", "新密码不能为空");
-            request.getRequestDispatcher("/admin/reset_password.jsp?userId=" + userId).forward(request, response);
+            showResetPwdForm(request, response);
             return;
         }
+        
+        // 基本验证：确认密码不能为空
+        if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
+            request.setAttribute("error", "确认密码不能为空");
+            showResetPwdForm(request, response);
+            return;
+        }
+        
+        // 基本验证：两次密码必须一致（前端已验证，这里作为双重保险）
+        if (!newPassword.equals(confirmPassword)) {
+            request.setAttribute("error", "两次输入的密码不一致");
+            showResetPwdForm(request, response);
+            return;
+        }
+        
+        // 验证密码复杂度
         if (!CryptoUtil.validatePasswordComplexity(newPassword)) {
             request.setAttribute("error", "密码必须包含8位以上，包含数字、大小写字母、特殊字符");
-            request.getRequestDispatcher("/admin/reset_password.jsp?userId=" + userId).forward(request, response);
+            showResetPwdForm(request, response);
             return;
         }
+        
         String hashedPassword = CryptoUtil.sm3Hash(newPassword);
         if (adminDao.updatePassword(userId, hashedPassword)) {
+            // 记录审计日志
+            Admin currentAdmin = (Admin) request.getSession().getAttribute("admin");
+            AuditLog log = new AuditLog(currentAdmin.getId(), currentAdmin.getFullName(), "重置密码", 
+                                       "重置管理员密码，用户ID: " + userId, request.getRemoteAddr());
+            log.setHmacSignature(CryptoUtil.generateHmacSm3(log.toString()));
+            auditLogDao.addAuditLog(log);
+            
             request.setAttribute("message", "密码重置成功");
         } else {
             request.setAttribute("error", "密码重置失败");
@@ -334,6 +361,11 @@ public class AdminUsersServlet extends HttpServlet {
             throws ServletException, IOException {
         int userId = Integer.parseInt(request.getParameter("userId"));
         Admin user = adminDao.getAdminById(userId);
+        if (user == null) {
+            request.setAttribute("error", "用户不存在");
+            doGet(request, response);
+            return;
+        }
         request.setAttribute("resetUser", user);
         request.getRequestDispatcher("/admin/reset_password.jsp").forward(request, response);
     }
